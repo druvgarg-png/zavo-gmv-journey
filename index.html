@@ -1,237 +1,313 @@
-import React, { useMemo, useState } from "react";
-import { TrendingUp, BarChart3, Info, CalendarDays } from "lucide-react";
-import {
-  ResponsiveContainer,
-  LineChart,
-  Line,
-  BarChart,
-  Bar,
-  XAxis,
-  YAxis,
-  Tooltip,
-  CartesianGrid,
-  ReferenceLine,
-} from "recharts";
-
-const INR = new Intl.NumberFormat("en-IN", {
-  style: "currency",
-  currency: "INR",
-  maximumFractionDigits: 2
-});
-
-const RAW = [
-  {
-    key: "2025-08",
-    label: "Aug",
-    month: "August",
-    gmvCr: 0.8,
-    note: "Foundational setup, early traction, key integrations live."
-  },
-  {
-    key: "2025-09",
-    label: "Sep",
-    month: "September",
-    gmvCr: 1.5,
-    note: "UX revamp + targeted brand mix → strong MoM lift."
-  },
-  {
-    key: "2025-10",
-    label: "Oct (TD)",
-    month: "October (to date)",
-    gmvCr: 2.1,
-    note: "Stable momentum, expanding GMV and repeat usage."
-  },
-];
-
-function growth(prev, curr) {
-  if (!prev) return null;
-  const pct = ((curr - prev) / prev) * 100;
-  return pct;
-}
-
-export default function ZavoGCGrowth() {
-  const [mode, setMode] = useState("line");
-  const [active, setActive] = useState(RAW[2]);
-
-  const data = useMemo(
-    () =>
-      RAW.map((d, i) => ({
-        ...d,
-        gmv: d.gmvCr * 1_00_00_000,
-        yoy: null,
-        momPct: growth(i > 0 ? RAW[i - 1].gmvCr : null, d.gmvCr),
-      })),
-    []
-  );
-
-  const maxINR = Math.max(...data.map((d) => d.gmv));
-  const yTick = (v) =>
-    v >= 1_00_00_000 ? `${(v / 1_00_00_000).toFixed(1)} Cr` : INR.format(v);
-
-  return (
-    <div className="w-full max-w-5xl mx-auto px-4 py-6">
-      <header className="flex items-center justify-between gap-4">
-        <div>
-          <h1 className="text-2xl font-semibold tracking-tight">
-            Zavo Gift Card Growth Journey
-          </h1>
-          <p className="text-sm text-gray-600">
-            Last to last month → Last month → This month (to date)
-          </p>
-        </div>
-        <div className="flex items-center gap-2">
-          <button
-            onClick={() => setMode("line")}
-            className={`inline-flex items-center gap-2 rounded-xl border px-3 py-2 text-sm ${
-              mode === "line"
-                ? "bg-black text-white border-black"
-                : "bg-white hover:bg-gray-50"
-            }`}
-            aria-pressed={mode === "line"}
-          >
-            <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 12l3-3 3 3 4-4M8 21l4-4 4 4M3 4h18M4 4h16v12a1 1 0 01-1 1H5a1 1 0 01-1-1V4z" />
-            </svg>
-            Line
-          </button>
-          <button
-            onClick={() => setMode("bar")}
-            className={`inline-flex items-center gap-2 rounded-xl border px-3 py-2 text-sm ${
-              mode === "bar"
-                ? "bg-black text-white border-black"
-                : "bg-white hover:bg-gray-50"
-            }`}
-            aria-pressed={mode === "bar"}
-          >
-            <BarChart3 className="h-4 w-4" />
-            Bar
-          </button>
-        </div>
-      </header>
-
-      {/* KPI Cards */}
-      <section className="mt-6 grid grid-cols-1 sm:grid-cols-3 gap-4">
-        {data.map((d) => (
-          <button
-            key={d.key}
-            onClick={() => setActive(d)}
-            className={`text-left rounded-2xl border p-4 shadow-sm transition ${
-              active.key === d.key ? "border-black shadow" : "hover:shadow"
-            }`}
-            aria-current={active.key === d.key ? "true" : "false"}
-          >
-            <div className="flex items-center justify-between">
-              <span className="text-sm text-gray-600 inline-flex items-center gap-1">
-                <CalendarDays className="h-4 w-4" />
-                {d.month}
-              </span>
-              <TrendingUp className="h-4 w-4 text-gray-500" />
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Zavo GMV — Bar/Line FIXED, Gap FIXED</title>
+<style>
+  :root{
+    --bg:#0b0b0b;
+    --card:#0f0f0f;
+    --muted:#a7adb2;
+    --accent:#ff7a00;
+    --border:#171717;
+  }
+  *{box-sizing:border-box}
+  html,body{height:100%;margin:0;background:var(--bg);color:#fff;font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;-webkit-font-smoothing:antialiased}
+  .page{max-width:1200px;margin:18px auto;padding:18px}
+  header{display:flex;align-items:center;justify-content:space-between;padding:12px;border-radius:12px;background:var(--card);border:1px solid var(--border)}
+  .title{font-weight:800;font-size:20px}
+  .subtitle{color:var(--muted);font-size:13px}
+  .layout{display:grid;grid-template-columns: 1fr 380px;gap:18px;margin-top:16px}
+  @media (max-width:980px){.layout{grid-template-columns:1fr}}
+  .panel{background:var(--card);padding:14px;border-radius:12px;border:1px solid var(--border)}
+  .chart-header{display:flex;justify-content:space-between;align-items:center;gap:12px}
+  .controls{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+  .seg{background:transparent;border:1px solid #272727;padding:8px 10px;border-radius:8px;color:var(--muted);cursor:pointer;font-weight:700}
+  .seg.active{background:linear-gradient(180deg,#ff8f2b,#ff7a00);color:#0b0b0b;border-color:transparent}
+  .chart-wrap{margin-bottom:0 !important;padding-bottom:0 !important;}
+  svg{width:100%;height:100%;display:block;margin-bottom:0 !important;padding-bottom:0 !important;}
+  .note-row{display:flex;align-items:center;gap:10px;margin-top:0 !important;}
+  .legend{display:flex;gap:10px;align-items:center;margin-top:0 !important;}
+  .dot{width:12px;height:12px;border-radius:3px;display:inline-block}
+  .dot.black{background:#0b0b0b;border:1px solid #222}
+  .dot.white{background:#ffffff}
+  .dot.orange{background:var(--accent)}
+  .kpi{background:#121212;padding:12px;border-radius:10px;border:1px solid #1b1b1b;margin-bottom:10px}
+  .kpi .label{color:var(--muted);font-size:13px}
+  .kpi .val{font-size:20px;font-weight:800;margin-top:6px}
+  .detail{margin-top:4px;background:#121212;padding:12px;border-radius:10px;border:1px solid #1b1b1b}
+  .detail-row{display:flex;justify-content:space-between;padding:8px 0;color:#d7d8db;font-size:15px}
+  .muted{color:var(--muted);font-size:13px}
+  .export{background:var(--accent);color:#0b0b0b;border:none;padding:9px 14px;border-radius:8px;font-weight:800;cursor:pointer}
+  .seg:focus, .export:focus { outline:2px solid rgba(255,122,0,0.16); outline-offset:3px }
+  .x-label{font-size:12px;fill:#cfd1d4}
+  .value-label{font-size:13px;fill:#ffffff;font-weight:700}
+  .y-label{font-size:13px;fill:#cfd1d4}
+  .small-muted{font-size:13px;color:var(--muted)}
+  .fade{opacity:0;transform:translateY(6px);transition:opacity 240ms ease, transform 240ms ease}
+  .fade.show{opacity:1;transform:none}
+  @media (max-width:520px){ .kpi .val{font-size:18px} .detail-row{font-size:13px} }
+</style>
+</head>
+<body>
+  <div class="page" role="main">
+    <header>
+      <div>
+        <div class="title">Zavo Gift Card GMV</div>
+        <div class="subtitle">3-Month Snapshot — fixed interaction + spacing</div>
+      </div>
+      <div class="muted">Updated: Oct 2025</div>
+    </header>
+    <div class="layout" aria-live="polite">
+      <section class="panel" aria-labelledby="chartTitle">
+        <div class="chart-header">
+          <div>
+            <div id="chartTitle" style="font-weight:800;font-size:16px">GMV Growth (Crores)</div>
+            <div class="muted" style="margin-top:4px">Tap/click bars or points; toggle view for expanded line.</div>
+          </div>
+          <div style="display:flex;align-items:center;gap:10px">
+            <div class="controls" role="tablist" aria-label="Chart view toggle">
+              <button class="seg active" id="btnBar" role="tab" aria-selected="true">Bar</button>
+              <button class="seg" id="btnLine" role="tab" aria-selected="false">Line</button>
             </div>
-            <div className="mt-2 text-xl font-semibold">{d.gmvCr.toFixed(1)} Cr</div>
-            <div className="mt-1 text-xs text-gray-600">
-              {d.momPct == null
-                ? "Base month"
-                : `${d.momPct > 0 ? "+" : ""}${d.momPct.toFixed(1)}% MoM`}
-            </div>
-            <p className="mt-3 text-xs text-gray-700 leading-relaxed">{d.note}</p>
-          </button>
-        ))}
-      </section>
-
-      {/* Chart */}
-      <section className="mt-6 rounded-2xl border p-4">
-        <div className="flex items-center justify-between">
-          <h2 className="font-medium">GMV Trend (₹)</h2>
-          <span className="text-xs text-gray-600 inline-flex items-center gap-1">
-            <Info className="h-3 w-3" /> Click cards to focus
-          </span>
-        </div>
-        <div className="h-72 mt-2">
-          <ResponsiveContainer width="100%" height="100%">
-            {mode === "line" ? (
-              <LineChart
-                data={data}
-                margin={{ top: 10, right: 16, left: 0, bottom: 0 }}
-              >
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="label" />
-                <YAxis
-                  tickFormatter={yTick}
-                  domain={[0, Math.ceil(maxINR / 1_00_00_000) * 1_00_00_000]}
-                />
-                <Tooltip
-                  formatter={(val) => INR.format(val)}
-                  labelFormatter={(l) => `Month: ${l}`}
-                />
-                <ReferenceLine
-                  x={active.label}
-                  stroke="#111"
-                  strokeDasharray="4 2"
-                />
-                <Line
-                  type="monotone"
-                  dataKey="gmv"
-                  stroke="#111"
-                  strokeWidth={2}
-                  dot={{ r: 4 }}
-                  activeDot={{ r: 6 }}
-                />
-              </LineChart>
-            ) : (
-              <BarChart
-                data={data}
-                margin={{ top: 10, right: 16, left: 0, bottom: 0 }}
-              >
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="label" />
-                <YAxis
-                  tickFormatter={yTick}
-                  domain={[0, Math.ceil(maxINR / 1_00_00_000) * 1_00_00_000]}
-                />
-                <Tooltip
-                  formatter={(val) => INR.format(val)}
-                  labelFormatter={(l) => `Month: ${l}`}
-                />
-                <ReferenceLine
-                  x={active.label}
-                  stroke="#111"
-                  strokeDasharray="4 2"
-                />
-                <Bar dataKey="gmv" radius={[8, 8, 0, 0]} fill="#111" />
-              </BarChart>
-            )}
-          </ResponsiveContainer>
-        </div>
-      </section>
-
-      {/* Detail Panel */}
-      <section className="mt-6 grid gap-3 sm:grid-cols-3">
-        <div className="rounded-xl border p-4">
-          <div className="text-xs text-gray-600">Selected</div>
-          <div className="mt-1 text-lg font-semibold">{active.month}</div>
-          <div className="mt-1 text-sm text-gray-700">
-            GMV: {INR.format(active.gmvCr * 1_00_00_000)}
+            <button class="export" id="exportBtn">Export PNG</button>
           </div>
         </div>
-        <div className="rounded-xl border p-4">
-          <div className="text-xs text-gray-600">MoM Growth</div>
-          <div className="mt-1 text-lg font-semibold">
-            {(() => {
-              const i = RAW.findIndex((r) => r.key === active.key);
-              if (i <= 0) return "—";
-              const pct = growth(RAW[i - 1].gmvCr, RAW[i].gmvCr);
-              return `${pct > 0 ? "+" : ""}${pct?.toFixed(1)}%`;
-            })()}
-          </div>
-          <div className="mt-1 text-xs text-gray-600">vs previous month</div>
+        <div class="chart-wrap" id="chartWrap">
+          <svg id="chartSvg" viewBox="0 0 1100 720" preserveAspectRatio="xMinYMin meet" role="img" aria-label="GMV chart"></svg>
         </div>
-        <div className="rounded-xl border p-4">
-          <div className="text-xs text-gray-600">Notes</div>
-          <div className="mt-1 text-sm text-gray-700 leading-relaxed">
-            {active.note}
+        <div class="note-row">
+          <div class="legend" aria-hidden="true">
+            <span class="dot black"></span><span class="small-muted">Primary UI</span>
+            <span class="dot white"></span><span class="small-muted">Text</span>
+            <span class="dot orange"></span><span class="small-muted">Accent</span>
           </div>
+          <div class="small-muted">All values are GMV. October is month-to-date.</div>
+        </div>
+        <div class="detail fade show" id="detailBox" aria-live="polite">
+          <div class="detail-row"><div>Selected Month</div><div id="d-month">September</div></div>
+          <div class="detail-row"><div>GMV</div><div id="d-gmv">₹1.50 Cr</div></div>
+          <div class="detail-row"><div>Growth vs Prior</div><div id="d-growth">+87.5%</div></div>
+          <div class="detail-row"><div>Note</div><div id="d-note">Curation + UX improvements drove conversions.</div></div>
         </div>
       </section>
+      <aside class="panel">
+        <div style="font-weight:800;margin-bottom:10px">Quick KPIs</div>
+        <div class="kpi"><div class="label">August</div><div class="val" id="kpiAug">₹0.80 Cr</div></div>
+        <div class="kpi"><div class="label">September</div><div class="val" id="kpiSep">₹1.50 Cr</div></div>
+        <div class="kpi"><div class="label">October (to date)</div><div class="val" id="kpiOct">₹2.10 Cr</div></div>
+        <div style="margin-top:12px" class="muted">Line mode hides bars and expands the chart for a clearer trend view.</div>
+      </aside>
     </div>
-  );
+  </div>
+<script>
+const data = [
+  { month: 'August', cr: 0.80, color: '#2a2a2a', note: 'Foundational setup; early traction.' },
+  { month: 'September', cr: 1.50, color: '#e9e9e9', note: 'Curation + UX improvements drove conversions.' },
+  { month: 'October (to date)', cr: 2.10, color: '#ff7a00', note: 'Momentum sustained; repeat usage rising.' }
+];
+const svg = document.getElementById('chartSvg');
+const chartWrap = document.getElementById('chartWrap');
+const viewW = 1100, viewH = 720;
+const padding = { left: 86, right: 70, top: 46, bottom: 105 };
+const chartW = viewW - padding.left - padding.right;
+const chartH = viewH - padding.top - padding.bottom;
+const maxCr = Math.max(...data.map(d=>d.cr));
+const yMax = Math.ceil((maxCr + 0.6) * 10) / 10;
+const n = data.length;
+const gap = 14;
+const barW = Math.max(64, (chartW - gap*(n+1)) / n);
+const formatCr = v => '₹' + v.toFixed(2) + ' Cr';
+const growthPct = (cur, prev) => prev ? ((cur - prev) / prev) * 100 : 0;
+
+// Purge SVG
+svg.innerHTML = '';
+
+// Draw grid & Y labels
+(function drawGrid(){
+  const ticks = 5;
+  for(let i=0;i<=ticks;i++){
+    const y = padding.top + (chartH * i / ticks);
+    const line = document.createElementNS('http://www.w3.org/2000/svg','line');
+    line.setAttribute('x1', padding.left); line.setAttribute('x2', viewW - padding.right);
+    line.setAttribute('y1', y); line.setAttribute('y2', y);
+    line.setAttribute('stroke', '#161616'); line.setAttribute('stroke-width', '1');
+    svg.appendChild(line);
+    const val = (yMax * (1 - i/ticks)).toFixed(1);
+    const txt = document.createElementNS('http://www.w3.org/2000/svg','text');
+    txt.setAttribute('x', padding.left - 16); txt.setAttribute('y', y + 5);
+    txt.setAttribute('text-anchor','end'); txt.setAttribute('fill','#cfd1d4');
+    txt.setAttribute('class','y-label');
+    txt.textContent = val + ' Cr';
+    svg.appendChild(txt);
+  }
+})();
+
+// Draw X labels
+(function drawXlabels(){
+  const yBase = padding.top + chartH + 10;
+  for(let i=0;i<n;i++){
+    const x = padding.left + gap + i*(barW + gap);
+    const lab = document.createElementNS('http://www.w3.org/2000/svg','text');
+    lab.setAttribute('x', x + barW/2); lab.setAttribute('y', yBase);
+    lab.setAttribute('text-anchor','middle'); lab.setAttribute('fill','#cfd1d4');
+    lab.setAttribute('class','x-label');
+    lab.textContent = data[i].month;
+    svg.appendChild(lab);
+  }
+})();
+
+const bars = [], points = [], valueLabels = [], circles = [];
+(function drawSeries(){
+  for(let i=0;i<n;i++){
+    const d = data[i];
+    const x = padding.left + gap + i*(barW + gap);
+    const yVal = padding.top + chartH * (1 - (d.cr / yMax));
+    const h = (padding.top + chartH) - yVal;
+    const rect = document.createElementNS('http://www.w3.org/2000/svg','rect');
+    rect.setAttribute('x', x); rect.setAttribute('y', yVal); rect.setAttribute('width', barW);
+    rect.setAttribute('height', h); rect.setAttribute('rx', 10); rect.setAttribute('fill', d.color);
+    rect.setAttribute('data-idx', i);
+    rect.style.cursor = 'pointer';
+    svg.appendChild(rect);
+    bars.push(rect);
+    const vlab = document.createElementNS('http://www.w3.org/2000/svg','text');
+    vlab.setAttribute('x', x + barW/2); vlab.setAttribute('y', yVal - 10);
+    vlab.setAttribute('text-anchor','middle'); vlab.setAttribute('fill','#fff');
+    vlab.setAttribute('class','value-label');
+    vlab.textContent = formatCr(d.cr);
+    svg.appendChild(vlab);
+    valueLabels.push(vlab);
+    const cx = x + barW/2;
+    const cy = yVal;
+    points.push([cx, cy]);
+    const circ = document.createElementNS('http://www.w3.org/2000/svg','circle');
+    circ.setAttribute('cx', cx); circ.setAttribute('cy', cy); circ.setAttribute('r', 13);
+    circ.setAttribute('fill', d.color); circ.setAttribute('opacity','0');
+    circ.style.cursor = 'pointer';
+    svg.appendChild(circ);
+    circles.push(circ);
+    // Attach handlers
+    [rect, vlab, circ].forEach(el =>
+      el.addEventListener('pointerdown', e => { e.preventDefault(); select(i); })
+    );
+  }
+  // Polyline for line mode
+  const ptsString = points.map(p => p.join(',')).join(' ');
+  const poly = document.createElementNS('http://www.w3.org/2000/svg','polyline');
+  poly.setAttribute('points', ptsString);
+  poly.setAttribute('fill','none'); poly.setAttribute('stroke','#fff'); poly.setAttribute('stroke-width','4');
+  poly.setAttribute('stroke-linecap','round'); poly.setAttribute('stroke-linejoin','round');
+  poly.setAttribute('opacity','0'); poly.setAttribute('vector-effect','non-scaling-stroke');
+  svg.appendChild(poly);
+  // Area under line
+  const lastX = points[points.length -1][0];
+  const firstX = points[0][0];
+  const areaPts = ptsString + ` ${lastX},${padding.top + chartH} ${firstX},${padding.top + chartH}`;
+  const area = document.createElementNS('http://www.w3.org/2000/svg','polygon');
+  area.setAttribute('points', areaPts); area.setAttribute('fill', '#ff7a0022'); area.setAttribute('opacity','0');
+  svg.appendChild(area);
+  window._chart = { poly, area, bars, circles, valueLabels };
+})();
+
+// Selection and toggle logic
+let currentIndex = 1;
+function select(i){
+  currentIndex = i;
+  const d = data[i];
+  document.getElementById('d-month').textContent = d.month;
+  document.getElementById('d-gmv').textContent = formatCr(d.cr);
+  const prev = data[i-1]?.cr ?? 0;
+  const g = growthPct(d.cr, prev);
+  document.getElementById('d-growth').textContent = i===0 ? '—' : (g>=0? '+' : '') + g.toFixed(1) + '%';
+  document.getElementById('d-note').textContent = d.note;
+  if (window._chart) {
+    window._chart.bars.forEach((b, idx) => {
+      b.setAttribute('opacity', idx===i && currentMode==='bar' ? '1' : (currentMode==='bar'?'0.85':'0'));
+      b.style.display = (currentMode==='bar' ? 'block' : 'none');
+    });
+    window._chart.valueLabels.forEach((vl, idx) => {
+      vl.setAttribute('fill', (idx===i && (currentMode==='bar'||currentMode==='line')) ? '#fff' : '#cfd1d4');
+      vl.style.display = (currentMode==='bar' ? 'block' : 'none');
+    });
+    window._chart.circles.forEach((c, idx) => {
+      c.setAttribute('opacity', currentMode === 'line' && idx === i ? '1' : (currentMode === 'line' ? '0.88' : '0'));
+      c.style.display = (currentMode==='line' ? 'block' : 'none');
+    });
+  }
 }
+let currentMode = 'bar';
+function setMode(mode){
+  currentMode = mode;
+  const extras = window._chart;
+  if(!extras) return;
+  if(mode === 'bar'){
+    extras.bars.forEach(b => { b.style.display = 'block'; });
+    extras.valueLabels.forEach(v => { v.style.display = 'block'; });
+    extras.circles.forEach(c => { c.style.display = 'none'; });
+    extras.poly.setAttribute('opacity','0');
+    extras.area.setAttribute('opacity','0');
+    chartWrap.classList.remove('line-mode');
+    document.getElementById('btnBar').classList.add('active');
+    document.getElementById('btnLine').classList.remove('active');
+    document.getElementById('btnBar').setAttribute('aria-selected','true');
+    document.getElementById('btnLine').setAttribute('aria-selected','false');
+  } else {
+    extras.bars.forEach(b => { b.style.display = 'none'; });
+    extras.valueLabels.forEach(v => { v.style.display = 'none'; });
+    extras.circles.forEach(c => { c.style.display = 'block'; });
+    extras.poly.setAttribute('opacity','1');
+    extras.area.setAttribute('opacity','0.16');
+    chartWrap.classList.add('line-mode');
+    document.getElementById('btnLine').classList.add('active');
+    document.getElementById('btnBar').classList.remove('active');
+    document.getElementById('btnLine').setAttribute('aria-selected','true');
+    document.getElementById('btnBar').setAttribute('aria-selected','false');
+    animatePolyline(extras.poly);
+  }
+  select(currentIndex);
+}
+// Toggle handlers
+document.getElementById('btnBar').addEventListener('click', ()=> setMode('bar'));
+document.getElementById('btnLine').addEventListener('click', ()=> setMode('line'));
+function animatePolyline(poly){
+  try {
+    const length = poly.getTotalLength();
+    poly.style.transition = 'none';
+    poly.setAttribute('stroke-dasharray', length);
+    poly.setAttribute('stroke-dashoffset', length);
+    poly.getBoundingClientRect();
+    poly.style.transition = 'stroke-dashoffset 680ms ease';
+    poly.setAttribute('stroke-dashoffset', 0);
+  } catch (e) {
+    poly.setAttribute('opacity','1');
+  }
+}
+setMode('bar');
+document.getElementById('exportBtn').addEventListener('click', ()=>{
+  const svgNode = document.getElementById('chartSvg');
+  const serializer = new XMLSerializer();
+  const svgString = serializer.serializeToString(svgNode);
+  const canvas = document.createElement('canvas');
+  canvas.width = 1600; canvas.height = 1100;
+  const ctx = canvas.getContext('2d');
+  const img = new Image();
+  const blob = new Blob([svgString], {type:'image/svg+xml;charset=utf-8'});
+  const url = URL.createObjectURL(blob);
+  img.onload = function(){
+    ctx.fillStyle = '#0f0f0f'; ctx.fillRect(0,0,canvas.width,canvas.height);
+    ctx.drawImage(img,0,0,canvas.width,canvas.height);
+    URL.revokeObjectURL(url);
+    const png = canvas.toDataURL('image/png');
+    const link = document.createElement('a'); link.download = 'zavo-gmv-fixed.png'; link.href = png; link.click();
+  };
+  img.src = url;
+});
+window.addEventListener('keydown', (e)=>{
+  if(e.key === 'ArrowLeft'){ currentIndex = Math.max(0, currentIndex -1); select(currentIndex); }
+  if(e.key === 'ArrowRight'){ currentIndex = Math.min(n-1, currentIndex +1); select(currentIndex); }
+});
+</script>
+</body>
+</html>
