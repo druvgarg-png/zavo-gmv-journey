@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Zavo Gift Card GMV — Improved (Bar + Expanded Line)</title>
+<title>Zavo GMV — Fixed: Touch, Spacing, Separate Line</title>
 <style>
   :root{
     --bg:#0b0b0b;
@@ -25,18 +25,16 @@
   .controls{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
   .seg{background:transparent;border:1px solid #272727;padding:8px 10px;border-radius:8px;color:var(--muted);cursor:pointer;font-weight:700}
   .seg.active{background:linear-gradient(180deg,#ff8f2b,#ff7a00);color:#0b0b0b;border-color:transparent}
-  /* Increase size of the chart region by approx 70% from previous "balanced" size */
+  /* chart region — larger but constrained */
   .chart-wrap{
-    height: min(85vh, 920px); /* larger but constrained */
-    max-height: 920px;
-    transition: height 260ms ease;
-    padding-top:8px; box-sizing:border-box;
+    height: min(72vh, 820px);
+    max-height: 820px;
+    transition: height 220ms ease;
+    padding-top:6px; box-sizing:border-box;
   }
-  /* When line mode is active make it even more prominent */
-  .chart-wrap.line-mode{ height: min(92vh, 1080px); }
-
+  .chart-wrap.line-mode{ height: min(86vh, 980px); } /* expanded for line mode */
   svg{width:100%;height:100%;display:block}
-  .legend{display:flex;gap:12px;align-items:center;margin-top:12px}
+  .legend{display:flex;gap:12px;align-items:center;margin-top:8px}
   .dot{width:12px;height:12px;border-radius:3px;display:inline-block}
   .dot.black{background:#0b0b0b;border:1px solid #222}
   .dot.white{background:#ffffff}
@@ -44,19 +42,21 @@
   .kpi{background:#121212;padding:12px;border-radius:10px;border:1px solid #1b1b1b;margin-bottom:10px}
   .kpi .label{color:var(--muted);font-size:13px}
   .kpi .val{font-size:20px;font-weight:800;margin-top:6px}
-  .detail{margin-top:14px;background:#121212;padding:12px;border-radius:10px;border:1px solid #1b1b1b}
+  .detail{margin-top:12px;background:#121212;padding:12px;border-radius:10px;border:1px solid #1b1b1b}
   .detail-row{display:flex;justify-content:space-between;padding:8px 0;color:#d7d8db;font-size:15px}
   .muted{color:var(--muted);font-size:13px}
   .export{background:var(--accent);color:#0b0b0b;border:none;padding:9px 14px;border-radius:8px;font-weight:800;cursor:pointer}
-  .export:focus{outline:2px solid rgba(255,122,0,0.22)}
-  /* subtle animation classes */
-  .fade-in{opacity:0;transform:translateY(6px);transition:opacity 260ms ease, transform 260ms ease}
-  .fade-in.visible{opacity:1;transform:translateY(0)}
-  /* make labels and bars visually denser */
-  .x-label{font-size:13px;fill:#cfd1d4}
-  .value-label{font-size:14px;fill:#ffffff;font-weight:700}
+  .seg:focus, .export:focus { outline:2px solid rgba(255,122,0,0.16); outline-offset:3px }
+  /* tighter labels and denser bars */
+  .x-label{font-size:12px;fill:#cfd1d4}
+  .value-label{font-size:13px;fill:#ffffff;font-weight:700}
   .y-label{font-size:13px;fill:#cfd1d4}
-  .seg:focus, .export:focus { outline:2px solid rgba(255,122,0,0.2); outline-offset:3px }
+  /* small appearance tweaks */
+  .note-row{display:flex;align-items:center;gap:12px;margin-top:8px}
+  .small-muted{font-size:13px;color:var(--muted)}
+  /* animation classes for cheap fade-in */
+  .fade{opacity:0;transform:translateY(6px);transition:opacity 240ms ease, transform 240ms ease}
+  .fade.show{opacity:1;transform:none}
   @media (max-width:520px){ .kpi .val{font-size:18px} .detail-row{font-size:13px} }
 </style>
 </head>
@@ -65,7 +65,7 @@
     <header>
       <div>
         <div class="title">Zavo Gift Card GMV</div>
-        <div class="subtitle">3-Month Snapshot — Bar + Expanded Line</div>
+        <div class="subtitle">3-Month Snapshot — fixed interaction + spacing</div>
       </div>
       <div class="muted">Updated: Oct 2025</div>
     </header>
@@ -76,7 +76,7 @@
         <div class="chart-header">
           <div>
             <div id="chartTitle" style="font-weight:800;font-size:16px">GMV Growth (Crores)</div>
-            <div class="muted" style="margin-top:6px">Click a bar/point to view details. Toggle views to expand line interface.</div>
+            <div class="muted" style="margin-top:6px">Tap/click bars or points; toggle view for expanded line.</div>
           </div>
 
           <div style="display:flex;align-items:center;gap:10px">
@@ -89,19 +89,19 @@
         </div>
 
         <div class="chart-wrap" id="chartWrap">
-          <svg id="chartSvg" viewBox="0 0 1100 760" preserveAspectRatio="xMinYMin meet" role="img" aria-label="GMV chart"></svg>
+          <svg id="chartSvg" viewBox="0 0 1100 720" preserveAspectRatio="xMinYMin meet" role="img" aria-label="GMV chart"></svg>
         </div>
 
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-top:12px">
-          <div class="legend" aria-hidden="true">
-            <span class="dot black"></span><span class="muted">Primary UI</span>
-            <span class="dot white"></span><span class="muted">Text/Surface</span>
-            <span class="dot orange"></span><span class="muted">Accent</span>
+        <div class="note-row">
+          <div class="legend" aria-hidden="true" style="margin-right:8px">
+            <span class="dot black"></span><span class="small-muted">Primary UI</span>
+            <span class="dot white"></span><span class="small-muted">Text</span>
+            <span class="dot orange"></span><span class="small-muted">Accent</span>
           </div>
-          <div class="muted">All values are GMV. October is month-to-date.</div>
+          <div class="small-muted">All values are GMV. October is month-to-date.</div>
         </div>
 
-        <div class="detail fade-in" id="detailBox" aria-live="polite">
+        <div class="detail fade show" id="detailBox" aria-live="polite">
           <div class="detail-row"><div>Selected Month</div><div id="d-month">September</div></div>
           <div class="detail-row"><div>GMV</div><div id="d-gmv">₹1.50 Cr</div></div>
           <div class="detail-row"><div>Growth vs Prior</div><div id="d-growth">+87.5%</div></div>
@@ -116,17 +116,17 @@
         <div class="kpi"><div class="label">September</div><div class="val" id="kpiSep">₹1.50 Cr</div></div>
         <div class="kpi"><div class="label">October (to date)</div><div class="val" id="kpiOct">₹2.10 Cr</div></div>
 
-        <div style="margin-top:12px" class="muted">Expanded line mode shows a larger, focused view without lag.</div>
+        <div style="margin-top:12px" class="muted">Line mode hides bars and expands the chart for a clearer trend view.</div>
       </aside>
     </div>
   </div>
 
 <script>
-/* Improved compact + expanded line SVG chart
-   - Reduced horizontal gaps between bars
-   - X labels closer to bars
-   - Line view expands the chart-wrap (class toggle) and performs a stroke animation
-   - Cheap, short animations only; still no external libraries
+/* Final fixed chart:
+   - Bars are denser (small gap), x-labels closer
+   - Bar and Line are separate: Line mode sets bars display none and shows polyline + points
+   - pointerdown added for touch support
+   - click/touch updates detail box
 */
 
 const data = [
@@ -137,11 +137,10 @@ const data = [
 
 const svg = document.getElementById('chartSvg');
 const chartWrap = document.getElementById('chartWrap');
-const detailBox = document.getElementById('detailBox');
 
-// viewBox dimensions tuned to larger presentation (no lag)
-const viewW = 1100, viewH = 760;
-const padding = { left: 90, right: 80, top: 48, bottom: 160 };
+// viewBox tuned for larger, denser feel
+const viewW = 1100, viewH = 720;
+const padding = { left: 86, right: 70, top: 46, bottom: 150 };
 const chartW = viewW - padding.left - padding.right;
 const chartH = viewH - padding.top - padding.bottom;
 
@@ -150,18 +149,18 @@ const maxCr = Math.max(...data.map(d=>d.cr));
 const yMax = Math.ceil((maxCr + 0.6) * 10) / 10;
 const n = data.length;
 
-// make bars denser: small gap value
-const gap = 18; // tightened gap
-const barW = Math.max(70, (chartW - gap*(n+1)) / n);
+// tightened gap for denser bars
+const gap = 14;
+const barW = Math.max(64, (chartW - gap*(n+1)) / n);
 
-// utility
+// helpers
 const formatCr = v => '₹' + v.toFixed(2) + ' Cr';
 const growthPct = (cur, prev) => prev ? ((cur - prev) / prev) * 100 : 0;
 
 // clear svg
 while(svg.firstChild) svg.removeChild(svg.firstChild);
 
-// grid lines and Y labels (bolder spacing)
+// grid lines and y labels
 (function drawGrid(){
   const ticks = 5;
   for(let i=0;i<=ticks;i++){
@@ -174,7 +173,7 @@ while(svg.firstChild) svg.removeChild(svg.firstChild);
 
     const val = (yMax * (1 - i/ticks)).toFixed(1);
     const txt = document.createElementNS('http://www.w3.org/2000/svg','text');
-    txt.setAttribute('x', padding.left - 18); txt.setAttribute('y', y + 5);
+    txt.setAttribute('x', padding.left - 16); txt.setAttribute('y', y + 5);
     txt.setAttribute('text-anchor','end'); txt.setAttribute('fill','#cfd1d4');
     txt.setAttribute('class','y-label'); txt.style.fontSize = '13px';
     txt.textContent = val + ' Cr';
@@ -182,22 +181,22 @@ while(svg.firstChild) svg.removeChild(svg.firstChild);
   }
 })();
 
-// x axis labels (closer to bars)
+// x axis labels placed closer to bars (tightened bottom offset)
 (function drawXlabels(){
-  const yBase = padding.top + chartH + 28; // pulled up a bit to be nearer
+  const yBase = padding.top + chartH + 18; // moved up close to bars
   for(let i=0;i<n;i++){
     const x = padding.left + gap + i*(barW + gap);
     const lab = document.createElementNS('http://www.w3.org/2000/svg','text');
     lab.setAttribute('x', x + barW/2); lab.setAttribute('y', yBase);
     lab.setAttribute('text-anchor','middle'); lab.setAttribute('fill','#cfd1d4');
-    lab.setAttribute('class','x-label'); lab.style.fontSize = '13px';
+    lab.setAttribute('class','x-label'); lab.style.fontSize = '12px';
     lab.textContent = data[i].month;
     svg.appendChild(lab);
   }
 })();
 
-// draw bars and prepare line points
-const bars = [], valueLabels = [], points = [];
+// draw bars and compute points for the line
+const bars = [], points = [], valueLabels = [], circles = [];
 (function drawSeries(){
   for(let i=0;i<n;i++){
     const d = data[i];
@@ -208,7 +207,7 @@ const bars = [], valueLabels = [], points = [];
     // rect (bar)
     const rect = document.createElementNS('http://www.w3.org/2000/svg','rect');
     rect.setAttribute('x', x); rect.setAttribute('y', yVal); rect.setAttribute('width', barW);
-    rect.setAttribute('height', h); rect.setAttribute('rx', 12); rect.setAttribute('fill', d.color);
+    rect.setAttribute('height', h); rect.setAttribute('rx', 10); rect.setAttribute('fill', d.color);
     rect.setAttribute('data-idx', i);
     rect.style.cursor = 'pointer';
     svg.appendChild(rect);
@@ -216,22 +215,31 @@ const bars = [], valueLabels = [], points = [];
 
     // value label (above)
     const vlab = document.createElementNS('http://www.w3.org/2000/svg','text');
-    vlab.setAttribute('x', x + barW/2); vlab.setAttribute('y', yVal - 12);
+    vlab.setAttribute('x', x + barW/2); vlab.setAttribute('y', yVal - 10);
     vlab.setAttribute('text-anchor','middle'); vlab.setAttribute('fill','#ffffff');
-    vlab.setAttribute('class','value-label'); vlab.style.fontSize = '14px';
+    vlab.setAttribute('class','value-label'); vlab.style.fontSize = '13px';
     vlab.textContent = formatCr(d.cr);
     svg.appendChild(vlab);
     valueLabels.push(vlab);
 
-    // point coords for line
+    // point coords
     const cx = x + barW/2;
     const cy = yVal;
     points.push([cx, cy]);
 
-    // click handlers (cheap)
-    const handler = () => select(i);
-    rect.addEventListener('click', handler);
-    vlab.addEventListener('click', handler);
+    // circle for line mode
+    const circ = document.createElementNS('http://www.w3.org/2000/svg','circle');
+    circ.setAttribute('cx', cx); circ.setAttribute('cy', cy); circ.setAttribute('r', 8);
+    circ.setAttribute('fill', d.color); circ.setAttribute('opacity','0');
+    circ.style.cursor = 'pointer';
+    svg.appendChild(circ);
+    circles.push(circ);
+
+    // pointer/touch support (pointerdown covers mouse+touch)
+    const handler = (e) => { e.preventDefault(); select(i); };
+    rect.addEventListener('pointerdown', handler, {passive:false});
+    vlab.addEventListener('pointerdown', handler, {passive:false});
+    circ.addEventListener('pointerdown', handler, {passive:false});
   }
 
   // polyline for line mode
@@ -240,25 +248,10 @@ const bars = [], valueLabels = [], points = [];
   poly.setAttribute('points', ptsString);
   poly.setAttribute('fill','none'); poly.setAttribute('stroke','#ffffff'); poly.setAttribute('stroke-width','4');
   poly.setAttribute('stroke-linecap','round'); poly.setAttribute('stroke-linejoin','round');
-  poly.setAttribute('opacity','0'); // hidden initially
-  poly.setAttribute('vector-effect','non-scaling-stroke');
-
-  // for animation: compute length later
+  poly.setAttribute('opacity','0'); poly.setAttribute('vector-effect','non-scaling-stroke');
   svg.appendChild(poly);
 
-  // points (circles) for line view
-  const circleElems = [];
-  points.forEach((p, i) => {
-    const c = document.createElementNS('http://www.w3.org/2000/svg','circle');
-    c.setAttribute('cx', p[0]); c.setAttribute('cy', p[1]); c.setAttribute('r', 8);
-    c.setAttribute('fill', data[i].color); c.setAttribute('opacity', '0');
-    c.style.cursor = 'pointer';
-    c.addEventListener('click', ()=> select(i));
-    svg.appendChild(c);
-    circleElems.push(c);
-  });
-
-  // filled area under the line (hidden initially)
+  // area under line
   const lastX = points[points.length -1][0];
   const firstX = points[0][0];
   const areaPts = ptsString + ` ${lastX},${padding.top + chartH} ${firstX},${padding.top + chartH}`;
@@ -266,15 +259,10 @@ const bars = [], valueLabels = [], points = [];
   area.setAttribute('points', areaPts); area.setAttribute('fill', '#ff7a0022'); area.setAttribute('opacity','0');
   svg.appendChild(area);
 
-  // store extras for toggling
-  window._chart = { poly, circleElems, area, bars, valueLabels };
+  window._chart = { poly, area, bars, circles, valueLabels };
 })();
 
-// small entrance reveal for detail box
-setTimeout(()=> detailBox.classList.add('visible'), 120);
-detailBox.classList.add('visible'); // class present triggers css transition via fade-in
-
-// selection logic - default to middle (index 1)
+// default select middle
 let currentIndex = 1;
 select(currentIndex);
 
@@ -288,49 +276,54 @@ function select(i){
   document.getElementById('d-growth').textContent = i===0 ? '—' : (g>=0? '+' : '') + g.toFixed(1) + '%';
   document.getElementById('d-note').textContent = d.note;
 
-  // subtle emphasis on selected bar/value
-  window._chart.bars.forEach((b, idx)=> b.setAttribute('opacity', idx===i ? '1' : '0.82'));
-  window._chart.valueLabels.forEach((vl, idx)=> vl.setAttribute('fill', idx===i ? '#ffffff' : '#cfd1d4'));
+  // visuals: highlight selected bar and label
+  window._chart.bars.forEach((b, idx) => {
+    b.setAttribute('opacity', idx===i ? '1' : '0.78');
+    b.style.display = (currentMode === 'bar' ? 'block' : 'none');
+  });
+  window._chart.valueLabels.forEach((vl, idx) => vl.setAttribute('fill', idx===i ? '#ffffff' : '#cfd1d4'));
+  window._chart.circles.forEach((c, idx) => c.setAttribute('opacity', currentMode === 'line' && idx===i ? '1' : (currentMode === 'line' ? '0.92' : '0')));
 }
 
-// toggle modes: bar (default) and line (expanded)
+// Mode toggling with strict separation
+let currentMode = 'bar';
 const btnBar = document.getElementById('btnBar'), btnLine = document.getElementById('btnLine');
+
 btnBar.addEventListener('click', ()=> setMode('bar'));
 btnLine.addEventListener('click', ()=> setMode('line'));
 
 function setMode(mode){
+  currentMode = mode;
   const extras = window._chart;
   if(!extras) return;
   if(mode === 'bar'){
-    // hide line visuals
+    // show bars, hide line visuals
+    extras.bars.forEach(b => { b.style.display = 'block'; b.setAttribute('opacity','1'); });
+    extras.valueLabels.forEach(v => v.setAttribute('fill','#ffffff'));
+    extras.circles.forEach(c => c.setAttribute('opacity','0'));
     extras.poly.setAttribute('opacity','0');
     extras.area.setAttribute('opacity','0');
-    extras.circleElems.forEach(c=> c.setAttribute('opacity','0'));
-    extras.bars.forEach(b=> b.setAttribute('opacity','1'));
-    extras.valueLabels.forEach(v=> v.setAttribute('fill','#ffffff'));
+    chartWrap.classList.remove('line-mode');
     btnBar.classList.add('active'); btnLine.classList.remove('active');
     btnBar.setAttribute('aria-selected','true'); btnLine.setAttribute('aria-selected','false');
-    // shrink chart-wrap a bit if previously expanded
-    chartWrap.classList.remove('line-mode');
   } else {
-    // switch to expanded line mode
-    btnLine.classList.add('active'); btnBar.classList.remove('active');
-    btnLine.setAttribute('aria-selected','true'); btnBar.setAttribute('aria-selected','false');
-    // fade bars to lower opacity
-    extras.bars.forEach(b=> b.setAttribute('opacity','0.36'));
-    extras.valueLabels.forEach(v=> v.setAttribute('fill','#cfd1d4'));
-    // show line and animate stroke
+    // hide bars completely (display none) so no touch/click conflict
+    extras.bars.forEach(b => { b.style.display = 'none'; });
+    extras.valueLabels.forEach(v => v.setAttribute('fill','#cfd1d4'));
+    // show line + area and animate
     extras.poly.setAttribute('opacity','1');
     extras.area.setAttribute('opacity','0.18');
-    extras.circleElems.forEach((c, idx) => {
-      // staggered fade-in for points
-      setTimeout(()=> c.setAttribute('opacity','1'), 120 + idx * 80);
+    extras.circles.forEach((c, idx) => {
+      c.setAttribute('opacity','0'); // start hidden
+      setTimeout(()=> c.setAttribute('opacity','1'), 120 + idx*80); // stagger fade-in
     });
-    // animate polyline stroke drawing
     animatePolyline(extras.poly);
-    // expand chart-wrap for focused view
     chartWrap.classList.add('line-mode');
+    btnLine.classList.add('active'); btnBar.classList.remove('active');
+    btnLine.setAttribute('aria-selected','true'); btnBar.setAttribute('aria-selected','false');
   }
+  // refresh selection visuals
+  select(currentIndex);
 }
 
 // animate polyline drawing using stroke-dasharray (cheap)
@@ -340,17 +333,15 @@ function animatePolyline(poly){
     poly.style.transition = 'none';
     poly.setAttribute('stroke-dasharray', length);
     poly.setAttribute('stroke-dashoffset', length);
-    // force reflow
-    poly.getBoundingClientRect();
-    poly.style.transition = 'stroke-dashoffset 700ms ease';
+    poly.getBoundingClientRect(); // force reflow
+    poly.style.transition = 'stroke-dashoffset 680ms ease';
     poly.setAttribute('stroke-dashoffset', 0);
-  } catch(e){
-    // fallback: just set visible
+  } catch (e) {
     poly.setAttribute('opacity','1');
   }
 }
 
-// default mode: bar (keep export available)
+// default
 setMode('bar');
 
 // export (on-demand)
@@ -359,7 +350,7 @@ document.getElementById('exportBtn').addEventListener('click', ()=>{
   const serializer = new XMLSerializer();
   const svgString = serializer.serializeToString(svgNode);
   const canvas = document.createElement('canvas');
-  canvas.width = 1600; canvas.height = 1000;
+  canvas.width = 1600; canvas.height = 1100;
   const ctx = canvas.getContext('2d');
   const img = new Image();
   const blob = new Blob([svgString], {type:'image/svg+xml;charset=utf-8'});
@@ -369,12 +360,12 @@ document.getElementById('exportBtn').addEventListener('click', ()=>{
     ctx.drawImage(img,0,0,canvas.width,canvas.height);
     URL.revokeObjectURL(url);
     const png = canvas.toDataURL('image/png');
-    const link = document.createElement('a'); link.download = 'zavo-gmv-expanded.png'; link.href = png; link.click();
+    const link = document.createElement('a'); link.download = 'zavo-gmv-fixed.png'; link.href = png; link.click();
   };
   img.src = url;
 });
 
-// keyboard navigation
+// keyboard nav
 window.addEventListener('keydown', (e)=>{
   if(e.key === 'ArrowLeft'){ currentIndex = Math.max(0, currentIndex -1); select(currentIndex); }
   if(e.key === 'ArrowRight'){ currentIndex = Math.min(n-1, currentIndex +1); select(currentIndex); }
