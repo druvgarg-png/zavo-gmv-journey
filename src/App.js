@@ -68,8 +68,19 @@ export default function App() {
 
   const maxGmv = Math.max(...data.map((d) => d.gmv));
   const yAxisDomain = [0, Math.ceil(maxGmv / 1_00_00_000) * 1_00_00_000];
-  const yTickFormat = (v) =>
-    v >= 1_00_00_000 ? `${(v / 1_00_00_000).toFixed(1)} Cr` : INR.format(v);
+  const yTickFormat = (v) => {
+  // Handle the zero tick
+  if (v === 0) return "₹0"; 
+
+  // Convert to crores
+  const cr = v / 1_00_00_000;
+
+  // Format to max 2 decimal places, but remove trailing zeros
+  // e.g., 3.00 -> 3, 1.50 -> 1.5, 0.75 -> 0.75
+  const formatted = cr.toFixed(2).replace(/\.00$/, '').replace(/(\.\d)0$/, '$1');
+
+  return `${formatted} Cr`;
+  };
 
   return (
     <div className="w-full max-w-5xl mx-auto px-4 py-8">
