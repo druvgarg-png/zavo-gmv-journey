@@ -3,257 +3,328 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Zavo Gift Card GMV — Compact (Optimized)</title>
+<title>Zavo GMV — Compact Interactive (Bar / Line)</title>
 <style>
   :root{
-    --black:#0b0b0b;
-    --white:#ffffff;
-    --orange:#ff7a00;
-    --muted:#9aa0a6;
+    --bg: #0b0b0b;       /* ~68% black base */
+    --card: #0f0f0f;
+    --muted: #a7adb2;    /* white ~21% use */
+    --accent: #ff7a00;   /* ~11% orange */
+    --panel-border: #171717;
   }
-  html,body{height:100%;margin:0;background:var(--black);color:var(--white);font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif}
-  .container{
-    max-width:920px;margin:12px auto;padding:12px;
-    display:flex;flex-direction:column;gap:12px;
-  }
-  header{display:flex;justify-content:space-between;align-items:center;background:#0f0f0f;padding:10px;border-radius:10px;border:1px solid #171717}
-  .title{font-weight:600;font-size:15px}
+  *{box-sizing:border-box}
+  html,body{height:100%;margin:0;background:var(--bg);color:#fff;font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;-webkit-font-smoothing:antialiased}
+  .container{max-width:1100px;margin:20px auto;padding:18px}
+  header{display:flex;justify-content:space-between;align-items:center;background:var(--card);padding:12px;border-radius:12px;border:1px solid var(--panel-border)}
+  .title{font-weight:700;font-size:18px}
   .subtitle{color:var(--muted);font-size:13px}
-  /* layout */
-  .grid{display:flex;gap:12px;align-items:flex-start}
-  @media (max-width:800px){.grid{flex-direction:column}}
-  .card{background:#0f0f0f;padding:12px;border-radius:10px;border:1px solid #181818;flex:1}
-  .side{width:300px;min-width:220px}
-  .kpi{background:#121212;padding:10px;border-radius:8px;margin-bottom:8px;border:1px solid #1b1b1b}
-  .kpi .label{color:var(--muted);font-size:13px}
-  .kpi .val{font-size:17px;font-weight:700;margin-top:6px}
-  .note{color:var(--muted);font-size:12px;margin-top:8px}
-  /* Chart constraints: ensure chart + detail fit within viewport */
-  .chart-wrap{
-    height: min(48vh, 320px); /* key: restrict height so bars remain compact */
-    max-height: 360px;
-    padding-top:6px;
-    box-sizing:border-box;
-  }
-  svg{width:100%;height:100%;display:block}
-  .bar-label{font-size:12px;fill:#cfd1d4}
-  .bar-value{font-size:13px;fill:#ffffff;font-weight:700}
-  .bar-rect{rx:6}
-  .cta{background:var(--orange);color:#0b0b0b;border:none;padding:8px 10px;border-radius:8px;font-weight:700;cursor:pointer}
-  .legend{display:flex;gap:10px;margin-top:8px;align-items:center}
+  .layout{display:grid;grid-template-columns: 1fr 320px; gap:16px;margin-top:16px}
+  @media (max-width:980px){ .layout{grid-template-columns:1fr} }
+  .panel{background:var(--card);padding:14px;border-radius:12px;border:1px solid var(--panel-border)}
+  /* Chart area */
+  .chart-area{display:flex;flex-direction:column;gap:12px}
+  .controls{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+  .btn{background:transparent;color:var(--muted);border:1px solid #272727;padding:8px 10px;border-radius:8px;cursor:pointer;font-weight:600}
+  .btn.active{background:linear-gradient(180deg,#ff8f2b,#ff7a00);color:#0a0a0a;border-color:transparent}
+  .chart-wrap{height: max(320px, min(60vh, 520px)); /* balanced size */ padding:6px 0; box-sizing:border-box}
+  svg{width:100%;height:100%;display:block;overflow:visible}
+  .legend{display:flex;gap:12px;align-items:center;margin-top:8px}
   .dot{width:12px;height:12px;border-radius:3px;display:inline-block}
   .dot.black{background:#0b0b0b;border:1px solid #222}
   .dot.white{background:#ffffff}
-  .dot.orange{background:var(--orange)}
-  .detail{margin-top:10px;background:#121212;padding:8px;border-radius:8px;border:1px solid #1a1a1a}
-  .detail-row{display:flex;justify-content:space-between;padding:6px 0;color:#d7d8db;font-size:13px}
-  /* remove pointer-events heavy style on svg - keep it simple */
+  .dot.orange{background:var(--accent)}
+  /* KPI column */
+  .kpis{display:flex;flex-direction:column;gap:10px}
+  .kpi{background:#121212;padding:12px;border-radius:10px;border:1px solid #1b1b1b}
+  .kpi .label{color:var(--muted);font-size:13px}
+  .kpi .val{font-size:18px;font-weight:800;margin-top:6px}
+  .detail{margin-top:12px;background:#121212;padding:12px;border-radius:10px;border:1px solid #1b1b1b}
+  .detail-row{display:flex;justify-content:space-between;padding:6px 0;color:#d7d8db;font-size:14px}
+  .small{font-size:13px;color:var(--muted)}
+  /* compact controls */
+  .actions{display:flex;gap:8px;align-items:center}
+  .export{background:var(--accent);color:#0b0b0b;border:none;padding:8px 12px;border-radius:8px;font-weight:700;cursor:pointer}
+  /* accessibility focus */
+  .btn:focus, .export:focus { outline:2px solid rgba(255,122,0,0.25); outline-offset:2px }
+  /* responsive tweaks */
+  @media (max-width:520px){
+    .kpi .val{font-size:16px}
+    header{padding:10px}
+  }
 </style>
 </head>
 <body>
-  <div class="container">
+  <div class="container" role="main">
     <header>
       <div>
         <div class="title">Zavo Gift Card GMV</div>
-        <div class="subtitle">3-Month Snapshot — compact view</div>
+        <div class="subtitle">3-Month Snapshot — Interactive (Bar / Line)</div>
       </div>
-      <div class="subtitle">Updated: Oct 2025</div>
+      <div class="small">Updated: Oct 2025</div>
     </header>
 
-    <div class="grid" role="main">
-      <!-- Main -->
-      <div class="card" style="min-width:0">
+    <div class="layout" aria-live="polite">
+      <!-- Left: Chart -->
+      <section class="panel chart-area" aria-labelledby="chartHeading">
         <div style="display:flex;justify-content:space-between;align-items:center">
-          <div style="font-weight:700">GMV Growth</div>
-          <div style="color:var(--muted);font-size:13px">Clickable bars — compact</div>
-        </div>
-
-        <div class="chart-wrap" id="chartWrap" aria-hidden="false">
-          <svg id="gmvSvg" viewBox="0 0 800 260" preserveAspectRatio="xMinYMin meet" role="img" aria-label="GMV bar chart"></svg>
-        </div>
-
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-top:8px">
-          <div class="legend" aria-hidden="true">
-            <span class="dot black"></span><span style="color:#cfd1d4;font-size:13px">Primary UI</span>
-            <span class="dot white"></span><span style="color:#cfd1d4;font-size:13px">Text</span>
-            <span class="dot orange"></span><span style="color:#cfd1d4;font-size:13px">Accent</span>
+          <div>
+            <div id="chartHeading" style="font-weight:700">GMV Growth (Crores)</div>
+            <div class="small">Click a bar/point to view details</div>
           </div>
-          <button class="cta" id="exportBtn">Export PNG</button>
+
+          <div class="actions">
+            <div class="controls" role="tablist" aria-label="Chart type">
+              <button class="btn active" id="btn-bar" role="tab" aria-selected="true">Bar</button>
+              <button class="btn" id="btn-line" role="tab" aria-selected="false">Line</button>
+            </div>
+            <button class="export" id="exportBtn">Export PNG</button>
+          </div>
+        </div>
+
+        <!-- Chart container (SVG) -->
+        <div class="chart-wrap" id="chartWrap" aria-hidden="false">
+          <svg id="chartSvg" viewBox="0 0 900 420" preserveAspectRatio="xMinYMin meet" role="img" aria-label="GMV chart"></svg>
+        </div>
+
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <div class="legend" aria-hidden="true">
+            <span class="dot black"></span><span class="small">Primary UI</span>
+            <span class="dot white"></span><span class="small">Text/Surface</span>
+            <span class="dot orange"></span><span class="small">Accent</span>
+          </div>
+          <div class="small">All values are Gross Merchandise Value. October is month-to-date.</div>
         </div>
 
         <div class="detail" id="detailBox" aria-live="polite">
           <div class="detail-row"><div>Selected Month</div><div id="d-month">October (to date)</div></div>
           <div class="detail-row"><div>GMV</div><div id="d-gmv">₹2.10 Cr</div></div>
           <div class="detail-row"><div>Growth vs Prior</div><div id="d-growth">+40.0%</div></div>
+          <div class="detail-row"><div>Note</div><div id="d-note">Momentum sustained; curated brands.</div></div>
         </div>
+      </section>
 
-        <div class="note">All values are GMV. October is month-to-date.</div>
-      </div>
+      <!-- Right: KPIs -->
+      <aside class="panel">
+        <div style="font-weight:700;margin-bottom:8px">Quick KPIs</div>
+        <div class="kpis">
+          <div class="kpi"><div class="label">August</div><div class="val" id="kpi-aug">₹0.80 Cr</div></div>
+          <div class="kpi"><div class="label">September</div><div class="val" id="kpi-sep">₹1.50 Cr</div></div>
+          <div class="kpi"><div class="label">October (to date)</div><div class="val" id="kpi-oct">₹2.10 Cr</div></div>
 
-      <!-- Side -->
-      <aside class="card side" aria-labelledby="kpis">
-        <div style="font-weight:700">Quick KPIs</div>
-        <div class="kpi"><div class="label">August</div><div class="val" id="kpi-aug">₹0.80 Cr</div></div>
-        <div class="kpi"><div class="label">September</div><div class="val" id="kpi-sep">₹1.50 Cr</div></div>
-        <div class="kpi"><div class="label">October (to date)</div><div class="val" id="kpi-oct">₹2.10 Cr</div></div>
-        <div class="note">Designed to fit within one to two scrolls on most displays.</div>
+          <div style="margin-top:8px" class="small">Designed for speed: small DOM, SVG rendering, no heavy libraries.</div>
+        </div>
       </aside>
     </div>
   </div>
 
 <script>
-/* Compact, high-performance SVG chart
-   Key improvements:
-   - chart-wrap height is constrained (48vh max)
-   - bars capped at 70% of chart area to avoid very tall bars
-   - no CSS transforms or animations
-   - single simple event handlers
+/* Lightweight interactive SVG chart supporting:
+   - Bar view and Line view (toggle)
+   - Click a bar/point to update detail box
+   - Export as PNG (single user-triggered op)
+   - Minimal DOM, single render pass
 */
 
-const dataset = [
+// Data (crores)
+const data = [
   { month: 'August', cr: 0.80, color: '#2a2a2a', note: 'Foundational setup; early traction.' },
   { month: 'September', cr: 1.50, color: '#e9e9e9', note: 'Curation + revamp drove conversions.' },
   { month: 'October (to date)', cr: 2.10, color: '#ff7a00', note: 'Momentum sustained; repeat usage rising.' }
 ];
 
-const svg = document.getElementById('gmvSvg');
-// fixed viewBox used; displayed size controlled by CSS (.chart-wrap)
-const viewW = 800, viewH = 260;
-const padding = { left: 60, right: 30, top: 18, bottom: 42 };
+// Config / layout
+const svg = document.getElementById('chartSvg');
+const viewW = 900, viewH = 420;
+const padding = { left: 64, right: 34, top: 28, bottom: 72 };
 const chartW = viewW - padding.left - padding.right;
 const chartH = viewH - padding.top - padding.bottom;
 
-// compute scale but cap bar height to 70% of chartH
-const maxData = Math.max(...dataset.map(d=>d.cr));
-const rawScale = chartH / maxData;
-const capFactor = 0.70; // bars cannot exceed 70% of chartH
-const scale = Math.min(rawScale, (chartH * capFactor) / maxData);
+// compute scales - add headroom
+const maxCr = Math.max(...data.map(d=>d.cr));
+const yMax = Math.ceil((maxCr + 0.4) * 10) / 10; // round up nicely
+const xCount = data.length;
+const gap = 26;
+const barW = Math.max(40, (chartW - gap*(xCount+1)) / xCount);
 
-// draw grid lines and y labels (light)
-function drawGrid(){
+// helper format
+const formatCr = v => '₹' + v.toFixed(2) + ' Cr';
+const growthPct = (cur, prev) => prev ? ((cur - prev) / prev) * 100 : 0;
+
+// clear svg
+while(svg.firstChild) svg.removeChild(svg.firstChild);
+
+// draw horizontal grid lines and y labels
+(function drawGrid(){
   const ticks = 4;
   for(let i=0;i<=ticks;i++){
     const y = padding.top + (chartH * i / ticks);
+    // grid line
     const line = document.createElementNS('http://www.w3.org/2000/svg','line');
-    line.setAttribute('x1', padding.left);
-    line.setAttribute('x2', viewW - padding.right);
-    line.setAttribute('y1', y);
-    line.setAttribute('y2', y);
-    line.setAttribute('stroke', '#171717');
-    line.setAttribute('stroke-width', '1');
+    line.setAttribute('x1', padding.left); line.setAttribute('x2', viewW - padding.right);
+    line.setAttribute('y1', y); line.setAttribute('y2', y);
+    line.setAttribute('stroke', '#171717'); line.setAttribute('stroke-width', '1');
     svg.appendChild(line);
-
+    // y label
+    const val = (yMax * (1 - i/ticks)).toFixed(1);
     const txt = document.createElementNS('http://www.w3.org/2000/svg','text');
-    txt.setAttribute('x', padding.left - 10);
-    txt.setAttribute('y', y + 4);
-    txt.setAttribute('text-anchor','end');
-    txt.setAttribute('fill','#cfd1d4');
-    txt.style.fontSize = '12px';
-    const val = (maxData * (1 - i/ticks)).toFixed(1);
-    txt.textContent = val + ' Cr';
+    txt.setAttribute('x', padding.left - 10); txt.setAttribute('y', y + 4);
+    txt.setAttribute('text-anchor','end'); txt.setAttribute('fill','#cfd1d4');
+    txt.style.fontSize = '12px'; txt.textContent = val + ' Cr';
     svg.appendChild(txt);
+  }
+})();
+
+// draw baseline labels (x axis)
+(function drawXlabels(){
+  const yBase = padding.top + chartH + 28;
+  for(let i=0;i<xCount;i++){
+    const x = padding.left + gap + i*(barW + gap);
+    const lab = document.createElementNS('http://www.w3.org/2000/svg','text');
+    lab.setAttribute('x', x + barW/2); lab.setAttribute('y', yBase);
+    lab.setAttribute('text-anchor','middle'); lab.setAttribute('fill','#cfd1d4');
+    lab.style.fontSize='13px'; lab.textContent = data[i].month;
+    svg.appendChild(lab);
+  }
+})();
+
+// draw bars and line points (only once)
+const barElems = [], pointElems = [], valueLabels = [];
+
+(function drawSeries(){
+  for(let i=0;i<xCount;i++){
+    const d = data[i];
+    const x = padding.left + gap + i*(barW + gap);
+    const yVal = padding.top + chartH * (1 - (d.cr / yMax));
+    const h = (padding.top + chartH) - yVal;
+
+    // Bar rectangle
+    const rect = document.createElementNS('http://www.w3.org/2000/svg','rect');
+    rect.setAttribute('x', x); rect.setAttribute('y', yVal); rect.setAttribute('width', barW);
+    rect.setAttribute('height', h); rect.setAttribute('rx', 8); rect.setAttribute('fill', d.color);
+    rect.setAttribute('data-idx', i);
+    svg.appendChild(rect);
+    barElems.push(rect);
+
+    // Value label above bar
+    const vlab = document.createElementNS('http://www.w3.org/2000/svg','text');
+    vlab.setAttribute('x', x + barW/2); vlab.setAttribute('y', yVal - 10);
+    vlab.setAttribute('text-anchor','middle'); vlab.setAttribute('fill','#ffffff');
+    vlab.style.fontSize = '13px'; vlab.textContent = formatCr(d.cr);
+    svg.appendChild(vlab);
+    valueLabels.push(vlab);
+
+    // Line points (hidden by default)
+    const cx = x + barW/2;
+    const cy = yVal + h; // but line expects specific y; compute properly below
+    const circle = document.createElementNS('http://www.w3.org/2000/svg','circle');
+    circle.setAttribute('cx', cx); circle.setAttribute('cy', yVal); circle.setAttribute('r', 6);
+    circle.setAttribute('fill', d.color); circle.setAttribute('opacity', 0); // hidden initially
+    circle.setAttribute('data-idx', i);
+    svg.appendChild(circle);
+    pointElems.push(circle);
+
+    // make clickable
+    const handler = () => selectIndex(i);
+    rect.addEventListener('click', handler);
+    circle.addEventListener('click', handler);
+    vlab.addEventListener('click', handler);
+  }
+
+  // Draw polyline for line chart (hidden initially)
+  const points = data.map((d,i)=>{
+    const x = padding.left + gap + i*(barW + gap) + barW/2;
+    const y = padding.top + chartH * (1 - (d.cr / yMax));
+    return `${x},${y}`;
+  }).join(' ');
+  const poly = document.createElementNS('http://www.w3.org/2000/svg','polyline');
+  poly.setAttribute('points', points);
+  poly.setAttribute('fill','none'); poly.setAttribute('stroke','#ffffff');
+  poly.setAttribute('stroke-width','3'); poly.setAttribute('stroke-linecap','round'); poly.setAttribute('opacity','0');
+  svg.appendChild(poly);
+
+  // Also draw subtle filled area under line (hidden)
+  const areaPoints = `${points} ${padding.left + gap + (barW + gap)*(xCount-1) + barW/2},${padding.top+chartH} ${padding.left + gap - (barW)} ,${padding.top+chartH}`;
+  const polyArea = document.createElementNS('http://www.w3.org/2000/svg','polygon');
+  polyArea.setAttribute('points', areaPoints);
+  polyArea.setAttribute('fill', '#ff7a0022'); polyArea.setAttribute('opacity','0');
+  svg.appendChild(polyArea);
+
+  // store for toggling
+  window._chartExtras = { poly, polyArea, pointElems, barElems, valueLabels };
+})();
+
+function selectIndex(i){
+  const d = data[i];
+  document.getElementById('d-month').textContent = d.month;
+  document.getElementById('d-gmv').textContent = formatCr(d.cr);
+  const prev = data[i-1]?.cr ?? 0;
+  const g = growthPct(d.cr, prev);
+  document.getElementById('d-growth').textContent = i===0 ? '—' : (g>=0? '+' : '') + g.toFixed(1) + '%';
+  document.getElementById('d-note').textContent = d.note;
+  // highlight selected visuals subtly
+  window._chartExtras.barElems.forEach((b,idx)=> b.setAttribute('opacity', idx===i? '1' : '0.85'));
+  window._chartExtras.valueLabels.forEach((vl,idx)=> vl.setAttribute('fill', idx===i? '#ffffff' : '#cfd1d4'));
+}
+
+// Toggle between bar and line
+const btnBar = document.getElementById('btn-bar');
+const btnLine = document.getElementById('btn-line');
+btnBar.addEventListener('click', ()=> setMode('bar'));
+btnLine.addEventListener('click', ()=> setMode('line'));
+
+function setMode(mode){
+  const extras = window._chartExtras;
+  if(!extras) return;
+  if(mode === 'bar'){
+    extras.poly.setAttribute('opacity','0');
+    extras.polyArea.setAttribute('opacity','0');
+    extras.pointElems.forEach(c=> c.setAttribute('opacity','0'));
+    extras.barElems.forEach(b=> b.setAttribute('opacity','1'));
+    extras.valueLabels.forEach(v=> v.setAttribute('fill','#ffffff'));
+    btnBar.classList.add('active'); btnLine.classList.remove('active');
+    btnBar.setAttribute('aria-selected','true'); btnLine.setAttribute('aria-selected','false');
+  } else {
+    extras.poly.setAttribute('opacity','1');
+    extras.polyArea.setAttribute('opacity','0.18');
+    extras.pointElems.forEach(c=> c.setAttribute('opacity','1'));
+    extras.barElems.forEach(b=> b.setAttribute('opacity','0.35'));
+    extras.valueLabels.forEach(v=> v.setAttribute('fill','#cfd1d4'));
+    btnLine.classList.add('active'); btnBar.classList.remove('active');
+    btnLine.setAttribute('aria-selected','true'); btnBar.setAttribute('aria-selected','false');
   }
 }
 
-// draw bars
-function drawBars(){
-  const barCount = dataset.length;
-  const gap = 20;
-  const barW = Math.max(36, (chartW - gap*(barCount+1)) / barCount);
-  dataset.forEach((d,i)=>{
-    const x = padding.left + gap + i*(barW + gap);
-    // compute bar height using capped scale
-    const barH = Math.max(8, d.cr * scale);
-    const y = padding.top + (chartH - barH);
+// initial select last index
+selectIndex(data.length -1);
 
-    const rect = document.createElementNS('http://www.w3.org/2000/svg','rect');
-    rect.setAttribute('x', x.toString());
-    rect.setAttribute('y', y.toString());
-    rect.setAttribute('width', barW.toString());
-    rect.setAttribute('height', barH.toString());
-    rect.setAttribute('rx', 6);
-    rect.setAttribute('fill', d.color);
-    rect.setAttribute('class','bar-rect');
-    rect.style.cursor = 'pointer';
-    svg.appendChild(rect);
-
-    // month label
-    const lab = document.createElementNS('http://www.w3.org/2000/svg','text');
-    lab.setAttribute('x', (x + barW/2).toString());
-    lab.setAttribute('y', (padding.top + chartH + 20).toString());
-    lab.setAttribute('text-anchor','middle');
-    lab.setAttribute('fill','#cfd1d4');
-    lab.style.fontSize = '12px';
-    lab.textContent = d.month;
-    svg.appendChild(lab);
-
-    // value label
-    const vlab = document.createElementNS('http://www.w3.org/2000/svg','text');
-    vlab.setAttribute('x', (x + barW/2).toString());
-    vlab.setAttribute('y', (y - 8).toString());
-    vlab.setAttribute('text-anchor','middle');
-    vlab.setAttribute('fill','#ffffff');
-    vlab.style.fontSize = '13px';
-    vlab.textContent = '₹' + d.cr.toFixed(2) + ' Cr';
-    svg.appendChild(vlab);
-
-    // click handler (lightweight)
-    const select = ()=> selectMonth(i);
-    rect.addEventListener('click', select);
-    lab.addEventListener('click', select);
-    vlab.addEventListener('click', select);
-  });
-}
-
-// initial render
-drawGrid();
-drawBars();
-selectMonth(dataset.length -1);
-
-function selectMonth(idx){
-  const d = dataset[idx];
-  document.getElementById('d-month').textContent = d.month;
-  document.getElementById('d-gmv').textContent = '₹' + d.cr.toFixed(2) + ' Cr';
-  const prev = dataset[idx-1]?.cr ?? 0;
-  const growth = prev ? ((d.cr - prev)/prev)*100 : 0;
-  document.getElementById('d-growth').textContent = idx===0 ? '—' : (growth>=0? '+' : '') + growth.toFixed(1) + '%';
-}
-
-// Export SVG as PNG (on-demand)
-document.getElementById('exportBtn').addEventListener('click', () => {
-  const svgNode = document.getElementById('gmvSvg');
+// Export as PNG (on-demand)
+document.getElementById('exportBtn').addEventListener('click', ()=>{
+  const svgNode = document.getElementById('chartSvg');
   const serializer = new XMLSerializer();
   const svgString = serializer.serializeToString(svgNode);
   const canvas = document.createElement('canvas');
-  // use smaller resolution to keep export lightweight
-  canvas.width = 1000;
-  canvas.height = 400;
+  canvas.width = 1400; canvas.height = 650; // decent resolution
   const ctx = canvas.getContext('2d');
   const img = new Image();
   const blob = new Blob([svgString], {type:'image/svg+xml;charset=utf-8'});
   const url = URL.createObjectURL(blob);
   img.onload = function(){
-    ctx.fillStyle = '#0f0f0f';
+    ctx.fillStyle = getComputedStyle(document.body).backgroundColor || '#0b0b0b';
     ctx.fillRect(0,0,canvas.width,canvas.height);
     ctx.drawImage(img,0,0,canvas.width,canvas.height);
     URL.revokeObjectURL(url);
     const png = canvas.toDataURL('image/png');
-    const link = document.createElement('a');
-    link.download = 'zavo-gmv-compact.png';
-    link.href = png;
-    link.click();
+    const link = document.createElement('a'); link.download = 'zavo-gmv.png'; link.href = png; link.click();
   };
   img.src = url;
 });
 
-// keyboard nav (left/right)
-let cur = dataset.length-1;
+// keyboard nav
+let cur = data.length -1;
 window.addEventListener('keydown', (e)=>{
-  if(e.key === 'ArrowLeft'){ cur = Math.max(0, cur-1); selectMonth(cur); }
-  if(e.key === 'ArrowRight'){ cur = Math.min(dataset.length-1, cur+1); selectMonth(cur); }
+  if(e.key === 'ArrowLeft'){ cur = Math.max(0, cur-1); selectIndex(cur); }
+  if(e.key === 'ArrowRight'){ cur = Math.min(data.length-1, cur+1); selectIndex(cur); }
 });
-
-// responsive: keep svg viewBox fixed; CSS controls visible size so no heavy redraws required
 </script>
 </body>
 </html>
