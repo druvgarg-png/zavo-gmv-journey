@@ -1,227 +1,266 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <title>Zavo Gift Card GMV — 3-Month Journey (Optimized)</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <!-- Icons -->
-  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
-  <!-- Chart.js (single include) -->
-  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Zavo Gift Card GMV — 3-Month Journey (Light)</title>
 
-  <style>
-    :root{
-      --black:#0b0b0b;
-      --white:#ffffff;
-      --orange:#ff7a00;
-      --muted:#a4a6aa;
-    }
-    *{box-sizing:border-box}
-    html,body{margin:0;background:var(--black);color:var(--white);font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;-webkit-font-smoothing:antialiased}
-    .wrap{max-width:980px;margin:18px auto;padding:16px}
-    header{display:flex;gap:12px;align-items:center;justify-content:space-between;background:#0f0f0f;border-radius:12px;padding:10px 14px;border:1px solid #161616}
-    .brand{display:flex;align-items:center;gap:10px}
-    .pill{display:inline-flex;align-items:center;gap:8px;background:#111;border-radius:999px;padding:6px 10px;color:#e9eaec;font-size:14px;border:1px solid #1a1a1a}
-    .grid{display:grid;grid-template-columns:1fr 380px;gap:14px;margin-top:14px}
-    @media (max-width:900px){.grid{grid-template-columns:1fr}}
-    .card{background:#0f0f0f;border-radius:12px;padding:14px;border:1px solid #181818}
-    .card h3{margin:0;font-size:16px}
-    .sub{color:var(--muted);font-size:13px;margin-top:6px}
-    .kpis{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:12px}
-    @media (max-width:700px){.kpis{grid-template-columns:1fr}}
-    .kpi{background:#121212;border-radius:10px;padding:10px;border:1px solid #1b1b1b}
-    .kpi .label{font-size:12px;color:#c8c9cc}
-    .kpi .val{font-size:18px;font-weight:700;margin-top:6px}
-    .kpi .trend{font-size:12px;margin-top:6px}
-    .trend.up{color:#21c07a}
-    .legend{display:flex;gap:12px;align-items:center;margin-top:10px;flex-wrap:wrap}
-    .dot{width:12px;height:12px;border-radius:3px;display:inline-block}
-    .dot.black{background:#0b0b0b;border:1px solid #252525}
-    .dot.white{background:#ffffff}
-    .dot.orange{background:var(--orange)}
-    .panel{background:#121212;border-radius:10px;padding:10px;margin-top:12px;border:1px solid #1b1b1b}
-    .panel-row{display:flex;justify-content:space-between;margin:6px 0}
-    .panel-row .l{color:#c8c9cc;font-size:13px}
-    .panel-row .r{font-weight:700}
-    .footer{display:flex;justify-content:space-between;align-items:center;margin-top:12px;gap:10px}
-    .cta{background:var(--orange);color:#111;border:none;border-radius:8px;padding:8px 12px;cursor:pointer;font-weight:700}
-    .note{font-size:12px;color:#b7bbc1;margin-top:8px}
-  </style>
+<!-- optional icons (can remove if you prefer zero external) -->
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+
+<style>
+  :root{
+    --black:#0b0b0b;
+    --white:#ffffff;
+    --orange:#ff7a00;
+    --muted:#9aa0a6;
+  }
+  html,body{height:100%;margin:0;background:var(--black);color:var(--white);font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif}
+  .container{max-width:920px;margin:20px auto;padding:18px}
+  header{display:flex;justify-content:space-between;align-items:center;background:#0f0f0f;padding:12px 14px;border-radius:10px;border:1px solid #171717}
+  .title{display:flex;gap:10px;align-items:center;font-weight:600}
+  .subtitle{color:var(--muted);font-size:13px}
+  .grid{display:flex;gap:16px;margin-top:16px;align-items:flex-start}
+  @media (max-width:780px){.grid{flex-direction:column}}
+  .card{background:#0f0f0f;padding:14px;border-radius:10px;border:1px solid #181818;flex:1}
+  .side{width:300px;min-width:220px}
+  .kpi{background:#121212;padding:10px;border-radius:8px;margin-bottom:10px;border:1px solid #1b1b1b}
+  .kpi .label{color:var(--muted);font-size:13px}
+  .kpi .val{font-size:18px;font-weight:700;margin-top:6px}
+  .note{color:var(--muted);font-size:13px;margin-top:10px}
+  /* SVG wrapper */
+  .chart-wrap{padding:8px 0}
+  svg{width:100%;height:260px;display:block}
+  .bar-label{font-size:13px;fill:#cfd1d4}
+  .bar-value{font-size:14px;fill:#ffffff;font-weight:700}
+  .bar-rect{rx:8;transition:opacity 120ms ease, transform 120ms ease}
+  .bar-rect:hover{opacity:0.95;transform:translateY(-3px)}
+  button.cta{background:var(--orange);color:#0b0b0b;border:none;padding:9px 12px;border-radius:8px;font-weight:700;cursor:pointer}
+  .legend{display:flex;gap:10px;align-items:center;margin-top:10px}
+  .dot{width:12px;height:12px;border-radius:3px;display:inline-block}
+  .dot.black{background:var(--black);border:1px solid #222}
+  .dot.white{background:var(--white)}
+  .dot.orange{background:var(--orange)}
+  .detail{margin-top:12px;background:#121212;padding:10px;border-radius:8px;border:1px solid #1a1a1a}
+  .detail-row{display:flex;justify-content:space-between;padding:6px 0;color:#d7d8db}
+</style>
 </head>
 <body>
-  <div class="wrap">
+  <div class="container">
     <header>
-      <div class="brand">
-        <span class="pill"><i class="fa-solid fa-gift" style="color:var(--orange)"></i>&nbsp;Zavo Gift Cards</span>
-        <div style="padding:6px 10px;border-radius:8px;background:#151515;border:1px solid #202020;color:#d6d7da;font-size:13px">3-Month Journey</div>
+      <div class="title">
+        <i class="fa-solid fa-gift" style="color:var(--orange)"></i>
+        <div>
+          <div style="font-size:16px">Zavo Gift Card GMV</div>
+          <div class="subtitle">3-Month Snapshot (click any bar)</div>
+        </div>
       </div>
-      <div class="pill" style="background:#111;border:1px solid #222"><i class="fa-regular fa-clock"></i>&nbsp;Updated: Oct 2025</div>
+      <div class="subtitle">Updated: Oct 2025</div>
     </header>
 
-    <div class="grid" role="main">
-      <!-- Chart area -->
-      <section class="card" aria-labelledby="gmv-title">
-        <h3 id="gmv-title"><i class="fa-solid fa-arrow-trend-up" style="color:var(--orange)"></i>&nbsp;GMV Growth</h3>
-        <div class="sub">Click any bar to view month details. Small, fast, responsive.</div>
+    <div class="grid">
+      <!-- Main chart card -->
+      <div class="card" role="main" aria-labelledby="chartTitle">
+        <h3 id="chartTitle" style="margin:0;font-size:15px">GMV Growth (in Crores)</h3>
+        <div class="subtitle" style="margin-top:6px">Lightweight SVG chart — zero external chart libraries.</div>
 
-        <!-- constrained canvas size for performance -->
-        <div style="height:260px;margin-top:10px">
-          <canvas id="gmvChart" width="800" height="260" style="display:block;max-width:100%;height:100%"></canvas>
+        <div class="chart-wrap" id="chartWrap" aria-hidden="false">
+          <!-- SVG will be injected by JS -->
+          <svg id="gmvSvg" viewBox="0 0 800 260" preserveAspectRatio="xMinYMin meet"></svg>
         </div>
 
         <div class="legend" aria-hidden="true">
-          <span class="dot black"></span><span style="color:#cfd1d4;font-size:13px">Primary UI</span>
-          <span class="dot white"></span><span style="color:#cfd1d4;font-size:13px">Text/Surfaces</span>
-          <span class="dot orange"></span><span style="color:#cfd1d4;font-size:13px">Accent</span>
+          <span class="dot black"></span><span style="color:#cfd1d4">Primary UI</span>
+          <span class="dot white"></span><span style="color:#cfd1d4">Text/Surface</span>
+          <span class="dot orange"></span><span style="color:#cfd1d4">Accent</span>
         </div>
 
-        <div id="detailPanel" class="panel" aria-live="polite">
-          <div class="panel-row"><div class="l">Selected Month</div><div class="r" id="dp-month">October (to date)</div></div>
-          <div class="panel-row"><div class="l">GMV</div><div class="r" id="dp-gmv">₹2.10 Cr</div></div>
-          <div class="panel-row"><div class="l">Growth vs Prior</div><div class="r" id="dp-growth">+40.0%</div></div>
-          <div class="panel-row"><div class="l">Note</div><div class="r" id="dp-note">UX revamp + curated brands.</div></div>
+        <div class="detail" id="detailBox" aria-live="polite">
+          <div class="detail-row"><div>Selected Month</div><div id="d-month">October (to date)</div></div>
+          <div class="detail-row"><div>GMV</div><div id="d-gmv">₹2.10 Cr</div></div>
+          <div class="detail-row"><div>Growth vs Prior</div><div id="d-growth">+40.0%</div></div>
+          <div class="detail-row"><div>Note</div><div id="d-note">Momentum sustained; curated brands</div></div>
         </div>
 
-        <div class="footer">
-          <div style="color:#cfd1d4;font-size:13px">Tip: Click each bar for a quick breakdown</div>
-          <button class="cta" id="exportBtn"><i class="fa-solid fa-share-from-square"></i>&nbsp;Export PNG</button>
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-top:12px">
+          <div class="note">All values are GMV. October is month-to-date.</div>
+          <button class="cta" id="exportBtn">Export PNG</button>
         </div>
-        <div class="note">Values show Gross Merchandise Value (GMV). October is month-to-date.</div>
-      </section>
+      </div>
 
-      <!-- KPI / summary column -->
-      <aside class="card" aria-labelledby="kpi-title">
-        <h3 id="kpi-title"><i class="fa-solid fa-gauge-high" style="color:var(--orange)"></i>&nbsp;Quick KPIs</h3>
+      <!-- Side KPIs -->
+      <aside class="card side" aria-labelledby="kpis">
+        <h4 id="kpis" style="margin:0;font-size:15px">Quick KPIs</h4>
 
-        <div class="kpis" role="list">
-          <div class="kpi" role="listitem"><div class="label">August</div><div class="val" id="kpi-aug">₹0.80 Cr</div><div class="trend flat">Baseline</div></div>
-          <div class="kpi" role="listitem"><div class="label">September</div><div class="val" id="kpi-sep">₹1.50 Cr</div><div class="trend up" id="kpi-sep-trend">+87.5%</div></div>
-          <div class="kpi" role="listitem"><div class="label">October (to date)</div><div class="val" id="kpi-oct">₹2.10 Cr</div><div class="trend up" id="kpi-oct-trend">+40.0%</div></div>
+        <div class="kpi" aria-hidden="false">
+          <div class="label">August</div>
+          <div class="val" id="kpi-aug">₹0.80 Cr</div>
         </div>
 
-        <div class="panel" style="margin-top:12px">
-          <div class="panel-row"><div class="l">Most-moved brands</div><div class="r">Curated, high-intent list</div></div>
-          <div class="panel-row"><div class="l">Conversion lift</div><div class="r">UX flow optimization</div></div>
-          <div class="panel-row"><div class="l">Retention</div><div class="r">Repeat purchases</div></div>
+        <div class="kpi">
+          <div class="label">September</div>
+          <div class="val" id="kpi-sep">₹1.50 Cr</div>
         </div>
 
-        <div class="note" style="margin-top:12px">Single-file, CDN-only assets. Optimized for low CPU usage.</div>
+        <div class="kpi">
+          <div class="label">October (to date)</div>
+          <div class="val" id="kpi-oct">₹2.10 Cr</div>
+        </div>
+
+        <div class="note" style="margin-top:12px">Designed for speed: no heavy libs, instant interaction even on low-end devices.</div>
       </aside>
     </div>
   </div>
 
-  <script>
-    // Light-weight dataset
-    const dataSeries = [
-      { month: 'August', cr: 0.80, note: 'Foundational setup; early traction.' },
-      { month: 'September', cr: 1.50, note: 'Curation + UX revamp increased conversions.' },
-      { month: 'October (to date)', cr: 2.10, note: 'Momentum sustained; repeat usage rising.' }
-    ];
+<script>
+/*
+  Ultra-light SVG bar chart for three values.
+  - No external chart library
+  - Render once, minimal DOM updates
+  - Click bars to update details
+  - Export as PNG (draw SVG to canvas)
+*/
 
-    // small helper
-    const formatCr = cr => '₹' + cr.toFixed(2) + ' Cr';
-    function growthPct(curr, prev){ if (!prev) return 0; return ((curr - prev)/prev) * 100; }
+const dataset = [
+  { month: 'August', cr: 0.80, color: '#2a2a2a', note: 'Foundational setup; early traction.' },
+  { month: 'September', cr: 1.50, color: '#e9e9e9', note: 'Curation + revamp drove conversions.' },
+  { month: 'October (to date)', cr: 2.10, color: '#ff7a00', note: 'Momentum sustained; repeat usage rising.' }
+];
 
-    // Inject KPI growth values
-    (function injectKPIs(){
-      const gSep = growthPct(dataSeries[1].cr, dataSeries[0].cr);
-      const gOct = growthPct(dataSeries[2].cr, dataSeries[1].cr);
-      document.getElementById('kpi-sep-trend').textContent = `${gSep.toFixed(1)}%`;
-      document.getElementById('kpi-oct-trend').textContent = `${gOct.toFixed(1)}%`;
-    })();
+// Config
+const svg = document.getElementById('gmvSvg');
+const padding = { left: 60, right: 30, top: 20, bottom: 40 };
+const width = 800;
+const height = 260;
+const chartW = width - padding.left - padding.right;
+const chartH = height - padding.top - padding.bottom;
+const maxVal = Math.max(...dataset.map(d => d.cr)) * 1.2; // headroom
 
-    // Prepare chart data (use solid colors for performance)
-    const labels = dataSeries.map(d => d.month);
-    const values = dataSeries.map(d => d.cr);
-    const colors = ['#2a2a2a','#e9e9e9','#ff7a00']; // dark, light, orange
+// Clear svg
+while (svg.firstChild) svg.removeChild(svg.firstChild);
 
-    // Chart configuration
-    const ctx = document.getElementById('gmvChart').getContext('2d');
-    // Reduce device pixel ratio impact
-    const DPR = Math.min(window.devicePixelRatio || 1, 2);
-    ctx.canvas.width = ctx.canvas.clientWidth * DPR;
-    ctx.canvas.height = ctx.canvas.clientHeight * DPR;
-    ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
+// Create axes labels (Y axis scale)
+const ticks = 4;
+for (let i = 0; i <= ticks; i++) {
+  const y = padding.top + (chartH * i / ticks);
+  const val = (maxVal * (1 - i / ticks)).toFixed(1);
+  // horizontal grid line
+  const line = document.createElementNS('http://www.w3.org/2000/svg','line');
+  line.setAttribute('x1', padding.left);
+  line.setAttribute('x2', width - padding.right);
+  line.setAttribute('y1', y);
+  line.setAttribute('y2', y);
+  line.setAttribute('stroke', '#1b1b1b');
+  line.setAttribute('stroke-width', '1');
+  svg.appendChild(line);
+  // value text
+  const txt = document.createElementNS('http://www.w3.org/2000/svg','text');
+  txt.setAttribute('x', padding.left - 10);
+  txt.setAttribute('y', y + 4);
+  txt.setAttribute('text-anchor','end');
+  txt.setAttribute('class','bar-label');
+  txt.setAttribute('fill','#cfd1d4');
+  txt.style.fontSize = '12px';
+  txt.textContent = val + ' Cr';
+  svg.appendChild(txt);
+}
 
-    const chart = new Chart(ctx, {
-      type: 'bar',
-      data: {
-        labels,
-        datasets: [{
-          label: 'GMV (Cr)',
-          data: values,
-          backgroundColor: colors,
-          borderRadius: 8,
-          borderSkipped: false,
-        }]
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        animation: { duration: 250, easing: 'easeOutCubic' }, // short and light
-        interaction: { mode: 'index', intersect: false },
-        scales: {
-          x: {
-            grid: { display: false },
-            ticks: { color: '#e5e5e5', maxRotation: 0, autoSkip: false },
-            stacked: false,
-            maxBarThickness: 64,
-            minBarLength: 6
-          },
-          y: {
-            grid: { color: '#1b1b1b' },
-            ticks: {
-              color: '#cfd1d4',
-              callback: v => v.toFixed(1) + ' Cr'
-            },
-            suggestedMax: Math.max(...values) + 0.5
-          }
-        },
-        plugins: {
-          legend: { display: false },
-          tooltip: {
-            enabled: true,
-            backgroundColor: '#141414',
-            titleColor: '#fff',
-            bodyColor: '#e9eaec',
-            padding: 8,
-            callbacks: {
-              label: ctx => ` GMV: ${formatCr(ctx.parsed.y)}`
-            }
-          }
-        },
-        onClick: (evt, elements) => {
-          if (!elements.length) return;
-          const idx = elements[0].index;
-          const d = dataSeries[idx];
-          const prev = dataSeries[idx-1]?.cr ?? 0;
-          const growth = idx === 0 ? 0 : growthPct(d.cr, prev);
-          document.getElementById('dp-month').textContent = d.month;
-          document.getElementById('dp-gmv').textContent = formatCr(d.cr);
-          document.getElementById('dp-growth').textContent = (idx===0? '—' : (growth>=0? '+' : '') + growth.toFixed(1) + '%');
-          document.getElementById('dp-note').textContent = d.note;
-        }
-      }
-    });
+// Bars
+const barCount = dataset.length;
+const gap = 22;
+const barW = Math.max(36, (chartW - gap * (barCount + 1)) / barCount);
+dataset.forEach((d, i) => {
+  const x = padding.left + gap + i * (barW + gap);
+  const valPct = d.cr / maxVal;
+  const barH = Math.max(6, chartH * valPct);
+  const y = padding.top + (chartH - barH);
 
-    // Export chart as PNG (only canvas area)
-    document.getElementById('exportBtn').addEventListener('click', () => {
-      const link = document.createElement('a');
-      link.download = 'zavo-gmv-journey.png';
-      link.href = document.getElementById('gmvChart').toDataURL('image/png', 1.0);
-      link.click();
-    });
+  // rect
+  const rect = document.createElementNS('http://www.w3.org/2000/svg','rect');
+  rect.setAttribute('x', x);
+  rect.setAttribute('y', y);
+  rect.setAttribute('width', barW);
+  rect.setAttribute('height', barH);
+  rect.setAttribute('rx', 8);
+  rect.setAttribute('fill', d.color);
+  rect.setAttribute('class','bar-rect');
+  rect.style.cursor = 'pointer';
+  svg.appendChild(rect);
 
-    // Minor resize handler: throttle redraw
-    let resizeTimeout;
-    window.addEventListener('resize', () => {
-      clearTimeout(resizeTimeout);
-      resizeTimeout = setTimeout(()=> {
-        chart.resize();
-      }, 120);
-    });
-  </script>
+  // month label (below)
+  const lab = document.createElementNS('http://www.w3.org/2000/svg','text');
+  lab.setAttribute('x', x + barW/2);
+  lab.setAttribute('y', padding.top + chartH + 22);
+  lab.setAttribute('text-anchor','middle');
+  lab.setAttribute('class','bar-label');
+  lab.setAttribute('fill','#cfd1d4');
+  lab.style.fontSize = '13px';
+  lab.textContent = d.month;
+  svg.appendChild(lab);
+
+  // value label (above bar)
+  const vlab = document.createElementNS('http://www.w3.org/2000/svg','text');
+  vlab.setAttribute('x', x + barW/2);
+  vlab.setAttribute('y', y - 8);
+  vlab.setAttribute('text-anchor','middle');
+  vlab.setAttribute('class','bar-value');
+  vlab.setAttribute('fill','#ffffff');
+  vlab.style.fontSize = '13px';
+  vlab.textContent = '₹' + d.cr.toFixed(2) + ' Cr';
+  svg.appendChild(vlab);
+
+  // handle click (no heavy handlers)
+  rect.addEventListener('click', () => selectMonth(i));
+  lab.addEventListener('click', () => selectMonth(i));
+  vlab.addEventListener('click', () => selectMonth(i));
+});
+
+// initial selection
+selectMonth(dataset.length - 1);
+
+function selectMonth(idx) {
+  const d = dataset[idx];
+  document.getElementById('d-month').textContent = d.month;
+  document.getElementById('d-gmv').textContent = '₹' + d.cr.toFixed(2) + ' Cr';
+  const prev = dataset[idx-1]?.cr ?? 0;
+  const growth = prev ? ((d.cr - prev) / prev) * 100 : 0;
+  document.getElementById('d-growth').textContent = idx===0 ? '—' : (growth>=0? '+' : '') + growth.toFixed(1) + '%';
+  document.getElementById('d-note').textContent = d.note;
+}
+
+// Export SVG as PNG (draw to canvas)
+document.getElementById('exportBtn').addEventListener('click', () => {
+  const svgNode = document.getElementById('gmvSvg');
+  const serializer = new XMLSerializer();
+  const svgString = serializer.serializeToString(svgNode);
+  const canvas = document.createElement('canvas');
+  canvas.width = svgNode.viewBox.baseVal.width;
+  canvas.height = svgNode.viewBox.baseVal.height;
+  const ctx = canvas.getContext('2d');
+  const img = new Image();
+  const svgBlob = new Blob([svgString], {type: 'image/svg+xml;charset=utf-8'});
+  const url = URL.createObjectURL(svgBlob);
+  img.onload = function(){
+    ctx.fillStyle = '#0f0f0f';
+    ctx.fillRect(0,0,canvas.width,canvas.height);
+    ctx.drawImage(img,0,0);
+    URL.revokeObjectURL(url);
+    const png = canvas.toDataURL('image/png');
+    const link = document.createElement('a');
+    link.download = 'zavo-gmv.png';
+    link.href = png;
+    link.click();
+  };
+  img.src = url;
+});
+
+// Accessibility: allow keyboard selection (left/right arrows)
+let currentIdx = dataset.length - 1;
+window.addEventListener('keydown', (e) => {
+  if (e.key === 'ArrowLeft') currentIdx = Math.max(0, currentIdx - 1);
+  if (e.key === 'ArrowRight') currentIdx = Math.min(dataset.length - 1, currentIdx + 1);
+  selectMonth(currentIdx);
+});
+</script>
 </body>
 </html>
-
-
