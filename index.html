@@ -2,229 +2,191 @@
 <html lang="en">
 <head>
   <meta charset="utf-8" />
-  <title>Zavo Gift Card GMV — 3-Month Journey</title>
+  <title>Zavo Gift Card GMV — 3-Month Journey (Optimized)</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <!-- Icons -->
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
-  <!-- Chart.js -->
-  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1"></script>
+  <!-- Chart.js (single include) -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
 
   <style>
     :root{
-      --black:#0b0b0b;   /* ~68% base */
-      --white:#ffffff;   /* ~21% text/cards */
-      --orange:#ff7a00;  /* ~11% accent */
+      --black:#0b0b0b;
+      --white:#ffffff;
+      --orange:#ff7a00;
       --muted:#a4a6aa;
     }
     *{box-sizing:border-box}
-    html,body{margin:0;background:var(--black);color:var(--white);font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif}
-    .wrap{max-width:1100px;margin:auto;padding:20px}
-    header{
-      display:flex;gap:16px;align-items:center;justify-content:space-between;
-      border:1px solid #1b1b1b;background:#101010; padding:14px 16px;border-radius:16px
-    }
-    .brand{display:flex;align-items:center;gap:12px}
-    .pill{display:inline-flex;align-items:center;gap:8px;background:#111;border:1px solid #1f1f1f;padding:8px 12px;border-radius:999px;color:#e9eaec}
-    .pill i{color:var(--orange)}
-    .grid{display:grid;grid-template-columns:1.2fr .8fr;gap:18px;margin-top:18px}
+    html,body{margin:0;background:var(--black);color:var(--white);font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;-webkit-font-smoothing:antialiased}
+    .wrap{max-width:980px;margin:18px auto;padding:16px}
+    header{display:flex;gap:12px;align-items:center;justify-content:space-between;background:#0f0f0f;border-radius:12px;padding:10px 14px;border:1px solid #161616}
+    .brand{display:flex;align-items:center;gap:10px}
+    .pill{display:inline-flex;align-items:center;gap:8px;background:#111;border-radius:999px;padding:6px 10px;color:#e9eaec;font-size:14px;border:1px solid #1a1a1a}
+    .grid{display:grid;grid-template-columns:1fr 380px;gap:14px;margin-top:14px}
     @media (max-width:900px){.grid{grid-template-columns:1fr}}
-    .card{
-      border:1px solid #1b1b1b;background:#0f0f0f;border-radius:18px;padding:18px
-    }
-    .card h3{margin:0 0 6px 0;font-size:18px}
-    .sub{color:var(--muted);font-size:13px}
-    .kpis{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:12px}
+    .card{background:#0f0f0f;border-radius:12px;padding:14px;border:1px solid #181818}
+    .card h3{margin:0;font-size:16px}
+    .sub{color:var(--muted);font-size:13px;margin-top:6px}
+    .kpis{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:12px}
     @media (max-width:700px){.kpis{grid-template-columns:1fr}}
-    .kpi{
-      background:#121212;border:1px solid #1f1f1f;border-radius:14px;padding:14px
-    }
+    .kpi{background:#121212;border-radius:10px;padding:10px;border:1px solid #1b1b1b}
     .kpi .label{font-size:12px;color:#c8c9cc}
-    .kpi .val{font-size:20px;font-weight:700;margin-top:6px}
+    .kpi .val{font-size:18px;font-weight:700;margin-top:6px}
     .kpi .trend{font-size:12px;margin-top:6px}
     .trend.up{color:#21c07a}
-    .trend.flat{color:#e0e2e6}
-    .legend{display:flex;gap:12px;align-items:center;margin-top:8px;flex-wrap:wrap}
-    .dot{width:12px;height:12px;border-radius:4px;display:inline-block}
-    .dot.black{background:var(--black);border:1px solid #262626}
-    .dot.white{background:var(--white)}
+    .legend{display:flex;gap:12px;align-items:center;margin-top:10px;flex-wrap:wrap}
+    .dot{width:12px;height:12px;border-radius:3px;display:inline-block}
+    .dot.black{background:#0b0b0b;border:1px solid #252525}
+    .dot.white{background:#ffffff}
     .dot.orange{background:var(--orange)}
-    .footer{
-      margin-top:16px;display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;
-      color:#d7d8db;font-size:12px
-    }
-    .cta{
-      background:var(--orange);color:#1a1a1a;font-weight:700;border:none;border-radius:12px;
-      padding:10px 14px;cursor:pointer
-    }
-    .cta:active{transform:translateY(1px)}
-    .note{font-size:12px;color:#b7bbc1;margin-top:8px}
-    .panel{
-      background:#121212;border:1px solid #1f1f1f;border-radius:14px;padding:14px;margin-top:12px
-    }
+    .panel{background:#121212;border-radius:10px;padding:10px;margin-top:12px;border:1px solid #1b1b1b}
     .panel-row{display:flex;justify-content:space-between;margin:6px 0}
-    .panel-row .l{color:#c8c9cc}
-    .panel-row .r{font-weight:600}
-    a.link{color:var(--orange);text-decoration:none}
-    a.link:hover{text-decoration:underline}
+    .panel-row .l{color:#c8c9cc;font-size:13px}
+    .panel-row .r{font-weight:700}
+    .footer{display:flex;justify-content:space-between;align-items:center;margin-top:12px;gap:10px}
+    .cta{background:var(--orange);color:#111;border:none;border-radius:8px;padding:8px 12px;cursor:pointer;font-weight:700}
+    .note{font-size:12px;color:#b7bbc1;margin-top:8px}
   </style>
 </head>
 <body>
   <div class="wrap">
     <header>
       <div class="brand">
-        <span class="pill"><i class="fa-solid fa-gift"></i> Zavo Gift Cards</span>
-        <div class="pill" style="background:#141414;border-color:#232323"><i class="fa-solid fa-chart-line"></i> 3-Month Journey</div>
+        <span class="pill"><i class="fa-solid fa-gift" style="color:var(--orange)"></i>&nbsp;Zavo Gift Cards</span>
+        <div style="padding:6px 10px;border-radius:8px;background:#151515;border:1px solid #202020;color:#d6d7da;font-size:13px">3-Month Journey</div>
       </div>
-      <div class="pill"><i class="fa-regular fa-clock"></i> Updated: Oct 2025</div>
+      <div class="pill" style="background:#111;border:1px solid #222"><i class="fa-regular fa-clock"></i>&nbsp;Updated: Oct 2025</div>
     </header>
 
-    <div class="grid">
-      <!-- Chart Card -->
-      <section class="card">
-        <h3><i class="fa-solid fa-arrow-trend-up" style="color:var(--orange)"></i> GMV Growth</h3>
-        <div class="sub">Clickable bars. Select a month to see details.</div>
-        <canvas id="gmvChart" height="240" style="margin-top:10px"></canvas>
+    <div class="grid" role="main">
+      <!-- Chart area -->
+      <section class="card" aria-labelledby="gmv-title">
+        <h3 id="gmv-title"><i class="fa-solid fa-arrow-trend-up" style="color:var(--orange)"></i>&nbsp;GMV Growth</h3>
+        <div class="sub">Click any bar to view month details. Small, fast, responsive.</div>
 
-        <div class="legend">
-          <span class="dot black"></span><span class="sub">Primary UI (≈68% black)</span>
-          <span class="dot white"></span><span class="sub">Text/Surfaces (≈21% white)</span>
-          <span class="dot orange"></span><span class="sub">Accent/Highlights (≈11% orange)</span>
+        <!-- constrained canvas size for performance -->
+        <div style="height:260px;margin-top:10px">
+          <canvas id="gmvChart" width="800" height="260" style="display:block;max-width:100%;height:100%"></canvas>
+        </div>
+
+        <div class="legend" aria-hidden="true">
+          <span class="dot black"></span><span style="color:#cfd1d4;font-size:13px">Primary UI</span>
+          <span class="dot white"></span><span style="color:#cfd1d4;font-size:13px">Text/Surfaces</span>
+          <span class="dot orange"></span><span style="color:#cfd1d4;font-size:13px">Accent</span>
         </div>
 
         <div id="detailPanel" class="panel" aria-live="polite">
-          <div class="panel-row"><span class="l">Selected Month</span><span class="r" id="dp-month">October (to date)</span></div>
-          <div class="panel-row"><span class="l">GMV</span><span class="r" id="dp-gmv">₹2.10 Cr</span></div>
-          <div class="panel-row"><span class="l">Growth vs. Prior</span><span class="r" id="dp-growth">+40.0%</span></div>
-          <div class="panel-row"><span class="l">Notes</span><span class="r" id="dp-note">UX revamp + curated brands; momentum sustained.</span></div>
+          <div class="panel-row"><div class="l">Selected Month</div><div class="r" id="dp-month">October (to date)</div></div>
+          <div class="panel-row"><div class="l">GMV</div><div class="r" id="dp-gmv">₹2.10 Cr</div></div>
+          <div class="panel-row"><div class="l">Growth vs Prior</div><div class="r" id="dp-growth">+40.0%</div></div>
+          <div class="panel-row"><div class="l">Note</div><div class="r" id="dp-note">UX revamp + curated brands.</div></div>
         </div>
 
         <div class="footer">
-          <div>Tip: Click each bar for a quick breakdown.</div>
-          <button class="cta" id="exportBtn"><i class="fa-solid fa-share-from-square"></i> Share Image</button>
+          <div style="color:#cfd1d4;font-size:13px">Tip: Click each bar for a quick breakdown</div>
+          <button class="cta" id="exportBtn"><i class="fa-solid fa-share-from-square"></i>&nbsp;Export PNG</button>
         </div>
-        <div class="note">All values represent Gross Merchandise Value (GMV). October reflects month-to-date.</div>
+        <div class="note">Values show Gross Merchandise Value (GMV). October is month-to-date.</div>
       </section>
 
-      <!-- KPI Card -->
-      <aside class="card">
-        <h3><i class="fa-solid fa-gauge-high" style="color:var(--orange)"></i> Quick KPIs</h3>
-        <div class="kpis">
-          <div class="kpi">
-            <div class="label">August</div>
-            <div class="val" id="kpi-aug">₹0.80 Cr</div>
-            <div class="trend flat"><i class="fa-solid fa-circle-dot"></i> Baseline</div>
-          </div>
-          <div class="kpi">
-            <div class="label">September</div>
-            <div class="val" id="kpi-sep">₹1.50 Cr</div>
-            <div class="trend up" id="kpi-sep-trend"><i class="fa-solid fa-arrow-up"></i> +87.5%</div>
-          </div>
-          <div class="kpi">
-            <div class="label">October (to date)</div>
-            <div class="val" id="kpi-oct">₹2.10 Cr</div>
-            <div class="trend up" id="kpi-oct-trend"><i class="fa-solid fa-arrow-up"></i> +40.0%</div>
-          </div>
+      <!-- KPI / summary column -->
+      <aside class="card" aria-labelledby="kpi-title">
+        <h3 id="kpi-title"><i class="fa-solid fa-gauge-high" style="color:var(--orange)"></i>&nbsp;Quick KPIs</h3>
+
+        <div class="kpis" role="list">
+          <div class="kpi" role="listitem"><div class="label">August</div><div class="val" id="kpi-aug">₹0.80 Cr</div><div class="trend flat">Baseline</div></div>
+          <div class="kpi" role="listitem"><div class="label">September</div><div class="val" id="kpi-sep">₹1.50 Cr</div><div class="trend up" id="kpi-sep-trend">+87.5%</div></div>
+          <div class="kpi" role="listitem"><div class="label">October (to date)</div><div class="val" id="kpi-oct">₹2.10 Cr</div><div class="trend up" id="kpi-oct-trend">+40.0%</div></div>
         </div>
 
-        <div class="panel" style="margin-top:14px">
-          <div class="panel-row"><span class="l">Most-moved brands</span><span class="r">Curated high-intent list</span></div>
-          <div class="panel-row"><span class="l">Conversion lift</span><span class="r">UX flow optimization</span></div>
-          <div class="panel-row"><span class="l">Retention driver</span><span class="r">Repeat GC purchases</span></div>
+        <div class="panel" style="margin-top:12px">
+          <div class="panel-row"><div class="l">Most-moved brands</div><div class="r">Curated, high-intent list</div></div>
+          <div class="panel-row"><div class="l">Conversion lift</div><div class="r">UX flow optimization</div></div>
+          <div class="panel-row"><div class="l">Retention</div><div class="r">Repeat purchases</div></div>
         </div>
 
-        <div class="note" style="margin-top:10px">Designed for GitHub Pages. Single file, CDN assets only.</div>
+        <div class="note" style="margin-top:12px">Single-file, CDN-only assets. Optimized for low CPU usage.</div>
       </aside>
     </div>
   </div>
 
-  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1"></script>
   <script>
-    // ---- Data (month-to-date = 2.10 Cr for October) ----
+    // Light-weight dataset
     const dataSeries = [
-      { month: 'August',     cr: 0.80, note: 'Foundational setup; early traction.' },
-      { month: 'September',  cr: 1.50, note: 'Curation + revamp drove conversions.' },
-      { month: 'October (to date)', cr: 2.10, note: 'Momentum sustained; repeat usage up.' }
+      { month: 'August', cr: 0.80, note: 'Foundational setup; early traction.' },
+      { month: 'September', cr: 1.50, note: 'Curation + UX revamp increased conversions.' },
+      { month: 'October (to date)', cr: 2.10, note: 'Momentum sustained; repeat usage rising.' }
     ];
 
-    // Helper — Indian currency in Crores
-    const formatCr = (cr) => '₹' + cr.toFixed(2) + ' Cr';
+    // small helper
+    const formatCr = cr => '₹' + cr.toFixed(2) + ' Cr';
+    function growthPct(curr, prev){ if (!prev) return 0; return ((curr - prev)/prev) * 100; }
 
-    // Growth % vs prior
-    function growthPct(curr, prev){
-      if (!prev) return 0;
-      return ((curr - prev) / prev) * 100;
-    }
+    // Inject KPI growth values
+    (function injectKPIs(){
+      const gSep = growthPct(dataSeries[1].cr, dataSeries[0].cr);
+      const gOct = growthPct(dataSeries[2].cr, dataSeries[1].cr);
+      document.getElementById('kpi-sep-trend').textContent = `${gSep.toFixed(1)}%`;
+      document.getElementById('kpi-oct-trend').textContent = `${gOct.toFixed(1)}%`;
+    })();
 
-    // Inject KPI growth numbers
-    const gSep = growthPct(dataSeries[1].cr, dataSeries[0].cr);
-    const gOct = growthPct(dataSeries[2].cr, dataSeries[1].cr);
-    document.getElementById('kpi-sep-trend').innerHTML =
-      `<i class="fa-solid fa-arrow-up"></i> ${gSep.toFixed(1)}%`;
-    document.getElementById('kpi-oct-trend').innerHTML =
-      `<i class="fa-solid fa-arrow-up"></i> ${gOct.toFixed(1)}%`;
+    // Prepare chart data (use solid colors for performance)
+    const labels = dataSeries.map(d => d.month);
+    const values = dataSeries.map(d => d.cr);
+    const colors = ['#2a2a2a','#e9e9e9','#ff7a00']; // dark, light, orange
 
-    // Build Chart
+    // Chart configuration
     const ctx = document.getElementById('gmvChart').getContext('2d');
+    // Reduce device pixel ratio impact
+    const DPR = Math.min(window.devicePixelRatio || 1, 2);
+    ctx.canvas.width = ctx.canvas.clientWidth * DPR;
+    ctx.canvas.height = ctx.canvas.clientHeight * DPR;
+    ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
+
     const chart = new Chart(ctx, {
       type: 'bar',
       data: {
-        labels: dataSeries.map(d => d.month),
+        labels,
         datasets: [{
           label: 'GMV (Cr)',
-          data: dataSeries.map(d => d.cr),
-          borderRadius: 10,
+          data: values,
+          backgroundColor: colors,
+          borderRadius: 8,
           borderSkipped: false,
-          backgroundColor: (context) => {
-            const {ctx, chartArea, dataIndex} = context.chart;
-            if (!chartArea) return '#222';
-            // black, white, orange for Aug, Sep, Oct
-            if (dataIndex === 0) {
-              const g = ctx.createLinearGradient(0, chartArea.bottom, 0, chartArea.top);
-              g.addColorStop(0, '#191919'); g.addColorStop(1, '#2a2a2a');
-              return g;
-            }
-            if (dataIndex === 1) {
-              const g = ctx.createLinearGradient(0, chartArea.bottom, 0, chartArea.top);
-              g.addColorStop(0, '#ffffff'); g.addColorStop(1, '#e9e9e9');
-              return g;
-            }
-            const g = ctx.createLinearGradient(0, chartArea.bottom, 0, chartArea.top);
-            g.addColorStop(0, '#ff7a00'); g.addColorStop(1, '#ff9431');
-            return g;
-          },
-          hoverBackgroundColor: (context) => {
-            const i = context.dataIndex;
-            return i === 2 ? '#ffa45b' : (i === 1 ? '#f5f5f5' : '#333');
-          }
         }]
       },
       options: {
+        responsive: true,
         maintainAspectRatio: false,
+        animation: { duration: 250, easing: 'easeOutCubic' }, // short and light
+        interaction: { mode: 'index', intersect: false },
         scales: {
           x: {
-            grid: { display:false },
-            ticks: { color:'#e5e5e5', font:{ size:12 } }
+            grid: { display: false },
+            ticks: { color: '#e5e5e5', maxRotation: 0, autoSkip: false },
+            stacked: false,
+            maxBarThickness: 64,
+            minBarLength: 6
           },
           y: {
-            grid: { color:'#1f1f1f' },
+            grid: { color: '#1b1b1b' },
             ticks: {
-              color:'#cfd1d4',
-              callback: (v)=> v.toFixed(1) + ' Cr'
+              color: '#cfd1d4',
+              callback: v => v.toFixed(1) + ' Cr'
             },
-            suggestedMax: 2.5
+            suggestedMax: Math.max(...values) + 0.5
           }
         },
         plugins: {
-          legend: { display:false },
+          legend: { display: false },
           tooltip: {
-            backgroundColor:'#141414',
-            titleColor:'#ffffff',
-            bodyColor:'#e9eaec',
-            borderColor:'#2a2a2a',
-            borderWidth:1,
-            padding:10,
-            callbacks:{
-              label: (ctx)=> ` GMV: ${formatCr(ctx.parsed.y)}`
+            enabled: true,
+            backgroundColor: '#141414',
+            titleColor: '#fff',
+            bodyColor: '#e9eaec',
+            padding: 8,
+            callbacks: {
+              label: ctx => ` GMV: ${formatCr(ctx.parsed.y)}`
             }
           }
         },
@@ -232,25 +194,34 @@
           if (!elements.length) return;
           const idx = elements[0].index;
           const d = dataSeries[idx];
-          const prev = dataSeries[idx - 1]?.cr ?? 0;
+          const prev = dataSeries[idx-1]?.cr ?? 0;
           const growth = idx === 0 ? 0 : growthPct(d.cr, prev);
           document.getElementById('dp-month').textContent = d.month;
-          document.getElementById('dp-gmv').textContent   = formatCr(d.cr);
-          document.getElementById('dp-growth').textContent= (idx===0? '—' : (growth>=0? '+' : '') + growth.toFixed(1) + '%');
-          document.getElementById('dp-note').textContent   = d.note;
+          document.getElementById('dp-gmv').textContent = formatCr(d.cr);
+          document.getElementById('dp-growth').textContent = (idx===0? '—' : (growth>=0? '+' : '') + growth.toFixed(1) + '%');
+          document.getElementById('dp-note').textContent = d.note;
         }
       }
     });
 
-    // Export button → download PNG of the chart area
-    document.getElementById('exportBtn').addEventListener('click', ()=>{
+    // Export chart as PNG (only canvas area)
+    document.getElementById('exportBtn').addEventListener('click', () => {
       const link = document.createElement('a');
       link.download = 'zavo-gmv-journey.png';
       link.href = document.getElementById('gmvChart').toDataURL('image/png', 1.0);
       link.click();
     });
+
+    // Minor resize handler: throttle redraw
+    let resizeTimeout;
+    window.addEventListener('resize', () => {
+      clearTimeout(resizeTimeout);
+      resizeTimeout = setTimeout(()=> {
+        chart.resize();
+      }, 120);
+    });
   </script>
 </body>
 </html>
 
-Add Zavo GMV dashboard index.html
+
