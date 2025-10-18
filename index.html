@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Zavo GMV — Fixed: Touch, Spacing, Separate Line</title>
+<title>Zavo GMV — Touch Improved, Spacing Fixed, Modes Clean</title>
 <style>
   :root{
     --bg:#0b0b0b;
@@ -25,10 +25,10 @@
   .controls{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
   .seg{background:transparent;border:1px solid #272727;padding:8px 10px;border-radius:8px;color:var(--muted);cursor:pointer;font-weight:700}
   .seg.active{background:linear-gradient(180deg,#ff8f2b,#ff7a00);color:#0b0b0b;border-color:transparent}
-  .chart-wrap{ margin-bottom:4px; padding-bottom:4px; height:min(72vh, 820px); max-height:820px; transition: height 220ms ease; }
-  .chart-wrap.line-mode{ height:min(86vh, 980px); }
+  .chart-wrap{margin-bottom:2px;padding-bottom:2px;height:min(72vh, 820px);max-height:820px;}
+  .chart-wrap.line-mode{height:min(86vh, 980px);}
   svg{width:100%;height:100%;display:block}
-  .legend{display:flex;gap:12px;align-items:center;margin-top:2px;}
+  .legend{display:flex;gap:10px;align-items:center;margin-top:1px;}
   .dot{width:12px;height:12px;border-radius:3px;display:inline-block}
   .dot.black{background:#0b0b0b;border:1px solid #222}
   .dot.white{background:#ffffff}
@@ -36,7 +36,7 @@
   .kpi{background:#121212;padding:12px;border-radius:10px;border:1px solid #1b1b1b;margin-bottom:10px}
   .kpi .label{color:var(--muted);font-size:13px}
   .kpi .val{font-size:20px;font-weight:800;margin-top:6px}
-  .detail{margin-top:6px;background:#121212;padding:12px;border-radius:10px;border:1px solid #1b1b1b}
+  .detail{margin-top:4px;background:#121212;padding:12px;border-radius:10px;border:1px solid #1b1b1b}
   .detail-row{display:flex;justify-content:space-between;padding:8px 0;color:#d7d8db;font-size:15px}
   .muted{color:var(--muted);font-size:13px}
   .export{background:var(--accent);color:#0b0b0b;border:none;padding:9px 14px;border-radius:8px;font-weight:800;cursor:pointer}
@@ -44,12 +44,11 @@
   .x-label{font-size:12px;fill:#cfd1d4}
   .value-label{font-size:13px;fill:#ffffff;font-weight:700}
   .y-label{font-size:13px;fill:#cfd1d4}
-  .note-row{display:flex;align-items:center;gap:12px;margin-top:2px;}
+  .note-row{display:flex;align-items:center;gap:10px;margin-top:1px;}
   .small-muted{font-size:13px;color:var(--muted)}
   .fade{opacity:0;transform:translateY(6px);transition:opacity 240ms ease, transform 240ms ease}
   .fade.show{opacity:1;transform:none}
   @media (max-width:520px){ .kpi .val{font-size:18px} .detail-row{font-size:13px} }
-  .bar-active, .circle-active {stroke:#ff7a00;stroke-width:3;}
 </style>
 </head>
 <body>
@@ -63,14 +62,12 @@
     </header>
 
     <div class="layout" aria-live="polite">
-      <!-- Left: chart -->
       <section class="panel" aria-labelledby="chartTitle">
         <div class="chart-header">
           <div>
             <div id="chartTitle" style="font-weight:800;font-size:16px">GMV Growth (Crores)</div>
-            <div class="muted" style="margin-top:6px">Tap/click bars or points; toggle view for expanded line.</div>
+            <div class="muted" style="margin-top:4px">Tap/click bars or points; toggle view for expanded line.</div>
           </div>
-
           <div style="display:flex;align-items:center;gap:10px">
             <div class="controls" role="tablist" aria-label="Chart view toggle">
               <button class="seg active" id="btnBar" role="tab" aria-selected="true">Bar</button>
@@ -79,20 +76,17 @@
             <button class="export" id="exportBtn">Export PNG</button>
           </div>
         </div>
-
         <div class="chart-wrap" id="chartWrap">
           <svg id="chartSvg" viewBox="0 0 1100 720" preserveAspectRatio="xMinYMin meet" role="img" aria-label="GMV chart"></svg>
         </div>
-
         <div class="note-row">
-          <div class="legend" aria-hidden="true" style="margin-right:8px">
+          <div class="legend" aria-hidden="true" style="margin-right:6px">
             <span class="dot black"></span><span class="small-muted">Primary UI</span>
             <span class="dot white"></span><span class="small-muted">Text</span>
             <span class="dot orange"></span><span class="small-muted">Accent</span>
           </div>
           <div class="small-muted">All values are GMV. October is month-to-date.</div>
         </div>
-
         <div class="detail fade show" id="detailBox" aria-live="polite">
           <div class="detail-row"><div>Selected Month</div><div id="d-month">September</div></div>
           <div class="detail-row"><div>GMV</div><div id="d-gmv">₹1.50 Cr</div></div>
@@ -100,30 +94,25 @@
           <div class="detail-row"><div>Note</div><div id="d-note">Curation + UX improvements drove conversions.</div></div>
         </div>
       </section>
-
-      <!-- Right: KPIs -->
       <aside class="panel">
         <div style="font-weight:800;margin-bottom:10px">Quick KPIs</div>
         <div class="kpi"><div class="label">August</div><div class="val" id="kpiAug">₹0.80 Cr</div></div>
         <div class="kpi"><div class="label">September</div><div class="val" id="kpiSep">₹1.50 Cr</div></div>
         <div class="kpi"><div class="label">October (to date)</div><div class="val" id="kpiOct">₹2.10 Cr</div></div>
-
         <div style="margin-top:12px" class="muted">Line mode hides bars and expands the chart for a clearer trend view.</div>
       </aside>
     </div>
   </div>
-
 <script>
 const data = [
   { month: 'August', cr: 0.80, color: '#2a2a2a', note: 'Foundational setup; early traction.' },
   { month: 'September', cr: 1.50, color: '#e9e9e9', note: 'Curation + UX improvements drove conversions.' },
   { month: 'October (to date)', cr: 2.10, color: '#ff7a00', note: 'Momentum sustained; repeat usage rising.' }
 ];
-
 const svg = document.getElementById('chartSvg');
 const chartWrap = document.getElementById('chartWrap');
 const viewW = 1100, viewH = 720;
-const padding = { left: 86, right: 70, top: 46, bottom: 126 }; // reduced bottom
+const padding = { left: 86, right: 70, top: 46, bottom: 105 };
 const chartW = viewW - padding.left - padding.right;
 const chartH = viewH - padding.top - padding.bottom;
 const maxCr = Math.max(...data.map(d=>d.cr));
@@ -131,13 +120,11 @@ const yMax = Math.ceil((maxCr + 0.6) * 10) / 10;
 const n = data.length;
 const gap = 14;
 const barW = Math.max(64, (chartW - gap*(n+1)) / n);
-
 const formatCr = v => '₹' + v.toFixed(2) + ' Cr';
 const growthPct = (cur, prev) => prev ? ((cur - prev) / prev) * 100 : 0;
-
-while(svg.firstChild) svg.removeChild(svg.firstChild);
-
-// Draw grid
+// purge SVG
+svg.innerHTML = '';
+// Draw grid & Y labels
 (function drawGrid(){
   const ticks = 5;
   for(let i=0;i<=ticks;i++){
@@ -147,31 +134,28 @@ while(svg.firstChild) svg.removeChild(svg.firstChild);
     line.setAttribute('y1', y); line.setAttribute('y2', y);
     line.setAttribute('stroke', '#161616'); line.setAttribute('stroke-width', '1');
     svg.appendChild(line);
-
     const val = (yMax * (1 - i/ticks)).toFixed(1);
     const txt = document.createElementNS('http://www.w3.org/2000/svg','text');
     txt.setAttribute('x', padding.left - 16); txt.setAttribute('y', y + 5);
     txt.setAttribute('text-anchor','end'); txt.setAttribute('fill','#cfd1d4');
-    txt.setAttribute('class','y-label'); txt.style.fontSize = '13px';
+    txt.setAttribute('class','y-label');
     txt.textContent = val + ' Cr';
     svg.appendChild(txt);
   }
 })();
-
-// Draw labels
+// Draw X labels
 (function drawXlabels(){
-  const yBase = padding.top + chartH + 16;
+  const yBase = padding.top + chartH + 12;
   for(let i=0;i<n;i++){
     const x = padding.left + gap + i*(barW + gap);
     const lab = document.createElementNS('http://www.w3.org/2000/svg','text');
     lab.setAttribute('x', x + barW/2); lab.setAttribute('y', yBase);
     lab.setAttribute('text-anchor','middle'); lab.setAttribute('fill','#cfd1d4');
-    lab.setAttribute('class','x-label'); lab.style.fontSize = '12px';
+    lab.setAttribute('class','x-label');
     lab.textContent = data[i].month;
     svg.appendChild(lab);
   }
 })();
-
 const bars = [], points = [], valueLabels = [], circles = [];
 (function drawSeries(){
   for(let i=0;i<n;i++){
@@ -179,7 +163,6 @@ const bars = [], points = [], valueLabels = [], circles = [];
     const x = padding.left + gap + i*(barW + gap);
     const yVal = padding.top + chartH * (1 - (d.cr / yMax));
     const h = (padding.top + chartH) - yVal;
-
     const rect = document.createElementNS('http://www.w3.org/2000/svg','rect');
     rect.setAttribute('x', x); rect.setAttribute('y', yVal); rect.setAttribute('width', barW);
     rect.setAttribute('height', h); rect.setAttribute('rx', 10); rect.setAttribute('fill', d.color);
@@ -187,57 +170,46 @@ const bars = [], points = [], valueLabels = [], circles = [];
     rect.style.cursor = 'pointer';
     svg.appendChild(rect);
     bars.push(rect);
-
     const vlab = document.createElementNS('http://www.w3.org/2000/svg','text');
     vlab.setAttribute('x', x + barW/2); vlab.setAttribute('y', yVal - 10);
-    vlab.setAttribute('text-anchor','middle'); vlab.setAttribute('fill','#ffffff');
-    vlab.setAttribute('class','value-label'); vlab.style.fontSize = '13px';
+    vlab.setAttribute('text-anchor','middle'); vlab.setAttribute('fill','#fff');
+    vlab.setAttribute('class','value-label');
     vlab.textContent = formatCr(d.cr);
     svg.appendChild(vlab);
     valueLabels.push(vlab);
-
     const cx = x + barW/2;
     const cy = yVal;
     points.push([cx, cy]);
-
     const circ = document.createElementNS('http://www.w3.org/2000/svg','circle');
-    circ.setAttribute('cx', cx); circ.setAttribute('cy', cy); circ.setAttribute('r', 13); // bigger for touch
+    circ.setAttribute('cx', cx); circ.setAttribute('cy', cy); circ.setAttribute('r', 13);
     circ.setAttribute('fill', d.color); circ.setAttribute('opacity','0');
     circ.style.cursor = 'pointer';
     svg.appendChild(circ);
     circles.push(circ);
-
-    // Touch/click handlers
-    const handler = (e) => { e.preventDefault(); select(i); };
-    rect.addEventListener('pointerdown', handler, {passive:false});
-    vlab.addEventListener('pointerdown', handler, {passive:false});
-    circ.addEventListener('pointerdown', handler, {passive:false});
+    // Attach handlers
+    [rect, vlab, circ].forEach(el =>
+      el.addEventListener('pointerdown', e => { e.preventDefault(); select(i); })
+    );
   }
-
-  // polyline for line mode
+  // Polyline for line mode
   const ptsString = points.map(p => p.join(',')).join(' ');
   const poly = document.createElementNS('http://www.w3.org/2000/svg','polyline');
   poly.setAttribute('points', ptsString);
-  poly.setAttribute('fill','none'); poly.setAttribute('stroke','#ffffff'); poly.setAttribute('stroke-width','4');
+  poly.setAttribute('fill','none'); poly.setAttribute('stroke','#fff'); poly.setAttribute('stroke-width','4');
   poly.setAttribute('stroke-linecap','round'); poly.setAttribute('stroke-linejoin','round');
   poly.setAttribute('opacity','0'); poly.setAttribute('vector-effect','non-scaling-stroke');
   svg.appendChild(poly);
-
-  // area under line
+  // Area under line
   const lastX = points[points.length -1][0];
   const firstX = points[0][0];
   const areaPts = ptsString + ` ${lastX},${padding.top + chartH} ${firstX},${padding.top + chartH}`;
   const area = document.createElementNS('http://www.w3.org/2000/svg','polygon');
   area.setAttribute('points', areaPts); area.setAttribute('fill', '#ff7a0022'); area.setAttribute('opacity','0');
   svg.appendChild(area);
-
   window._chart = { poly, area, bars, circles, valueLabels };
 })();
-
-// Selection
+// Selection and mode logic
 let currentIndex = 1;
-select(currentIndex);
-
 function select(i){
   currentIndex = i;
   const d = data[i];
@@ -247,34 +219,31 @@ function select(i){
   const g = growthPct(d.cr, prev);
   document.getElementById('d-growth').textContent = i===0 ? '—' : (g>=0? '+' : '') + g.toFixed(1) + '%';
   document.getElementById('d-note').textContent = d.note;
-
   window._chart.bars.forEach((b, idx) => {
-    b.setAttribute('opacity', idx===i ? '1' : '0.78');
-    b.classList.toggle('bar-active', idx===i);
-    b.style.display = (currentMode === 'bar' ? 'block' : 'none');
+    b.setAttribute('opacity', idx===i && currentMode==='bar' ? '1' : (currentMode==='bar'?'0.85':'0'));
+    b.style.display = (currentMode==='bar' ? 'block' : 'none');
   });
-  window._chart.valueLabels.forEach((vl, idx) => vl.setAttribute('fill', idx===i ? '#ffffff' : '#cfd1d4'));
+  window._chart.valueLabels.forEach((vl, idx) => {
+    vl.setAttribute('fill', (idx===i && (currentMode==='bar'||currentMode==='line')) ? '#fff' : '#cfd1d4');
+    vl.style.display = (currentMode==='bar' ? 'block' : 'none');
+  });
   window._chart.circles.forEach((c, idx) => {
-    c.setAttribute('opacity', currentMode === 'line' && idx===i ? '1' : (currentMode === 'line' ? '0.92' : '0'));
-    c.classList.toggle('circle-active', currentMode === 'line' && idx===i);
-    c.style.display = (currentMode === 'line' ? 'block' : 'none');
+    c.setAttribute('opacity', currentMode === 'line' && idx === i ? '1' : (currentMode === 'line' ? '0.88' : '0'));
+    c.style.display = (currentMode==='line' ? 'block' : 'none');
   });
 }
-
-// Mode toggle (bar vs line - strict separation)
 let currentMode = 'bar';
-const btnBar = document.getElementById('btnBar'), btnLine = document.getElementById('btnLine');
-
+const btnBar = document.getElementById('btnBar'),
+      btnLine = document.getElementById('btnLine');
 btnBar.addEventListener('click', ()=> setMode('bar'));
 btnLine.addEventListener('click', ()=> setMode('line'));
-
 function setMode(mode){
   currentMode = mode;
   const extras = window._chart;
   if(!extras) return;
   if(mode === 'bar'){
-    extras.bars.forEach(b => { b.style.display = 'block'; b.setAttribute('opacity','1'); });
-    extras.valueLabels.forEach(v => v.setAttribute('fill','#ffffff'));
+    extras.bars.forEach(b => { b.style.display = 'block'; });
+    extras.valueLabels.forEach(v => { v.style.display = 'block'; });
     extras.circles.forEach(c => { c.style.display = 'none'; });
     extras.poly.setAttribute('opacity','0');
     extras.area.setAttribute('opacity','0');
@@ -283,10 +252,10 @@ function setMode(mode){
     btnBar.setAttribute('aria-selected','true'); btnLine.setAttribute('aria-selected','false');
   } else {
     extras.bars.forEach(b => { b.style.display = 'none'; });
-    extras.valueLabels.forEach(v => v.setAttribute('fill','#cfd1d4'));
+    extras.valueLabels.forEach(v => { v.style.display = 'none'; });
     extras.circles.forEach(c => { c.style.display = 'block'; });
     extras.poly.setAttribute('opacity','1');
-    extras.area.setAttribute('opacity','0.18');
+    extras.area.setAttribute('opacity','0.16');
     chartWrap.classList.add('line-mode');
     btnLine.classList.add('active'); btnBar.classList.remove('active');
     btnLine.setAttribute('aria-selected','true'); btnBar.setAttribute('aria-selected','false');
@@ -294,8 +263,6 @@ function setMode(mode){
   }
   select(currentIndex);
 }
-
-// Animates line drawing
 function animatePolyline(poly){
   try {
     const length = poly.getTotalLength();
@@ -309,11 +276,7 @@ function animatePolyline(poly){
     poly.setAttribute('opacity','1');
   }
 }
-
-// default
 setMode('bar');
-
-// Export
 document.getElementById('exportBtn').addEventListener('click', ()=>{
   const svgNode = document.getElementById('chartSvg');
   const serializer = new XMLSerializer();
@@ -333,8 +296,6 @@ document.getElementById('exportBtn').addEventListener('click', ()=>{
   };
   img.src = url;
 });
-
-// Keyboard nav
 window.addEventListener('keydown', (e)=>{
   if(e.key === 'ArrowLeft'){ currentIndex = Math.max(0, currentIndex -1); select(currentIndex); }
   if(e.key === 'ArrowRight'){ currentIndex = Math.min(n-1, currentIndex +1); select(currentIndex); }
